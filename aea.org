@@ -1,11 +1,14 @@
 [[http://www.crummy.com/software/BeautifulSoup/][BeautifulSoup]]
 
 
-#+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html"
+#+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
 import codecs
+import sys
 from bs4 import BeautifulSoup
-
-f = codecs.open(fname, "r", "latin1");
+# http://stackoverflow.com/questions/8986849/unicodeencodeerror-in-beautiful-soup-python-2-7-1
+sys.setdefaultencoding("utf-8")
+# http://stackoverflow.com/questions/11339955/python-string-encode-decode
+f = open(fname, "r")
 html = f.read()
 
 soup = BeautifulSoup(html, 'html.parser')
@@ -14,6 +17,7 @@ print(soup.prettify())
 #+END_SRC
 
 #+RESULTS:
+: <module 'sys' (built-in)>
 
 
 #+BEGIN_SRC python :var html="file:aea-2016-assa-prelim.html"
