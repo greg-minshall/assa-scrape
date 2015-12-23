@@ -1,19 +1,54 @@
 [[http://www.crummy.com/software/BeautifulSoup/][BeautifulSoup]]
 
+it seems that the structure of the file is such that the structure
+looks something like
+
+- font class="dayHeader" t
+- font class="sessionTime" t
+- font class="sessionLocation" t
+- font class="sessionSource" t
+- div class="sessionTitle" t
+- div class="presiding"
+  - font class="name" t
+  - font class="affiliation" t
+- div class="paper"
+  - font class="paperTitle" t
+  - div class="author"
+    - font class="name" t
+    - font class="affiliation" t
+  - div id=paper_NNNNN_abstract ttt
+
+L1:
+find first dayHeader
+L3:
+get next sibling
+is dayHeader?  yes, go to L1
+is not sessionTime? error E1
+L2:
+collect sessionLocation, sessionSource, sessionTitle, presiding
+get next sibling
+is dayHeader?  yes, go to L1
+is sessionTime?  yes, go to L2
+is not paper?  error E2
+collect paperTitle
+collect authors
+collect abstract
+go to L3
+
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
 import codecs
 import sys
 from bs4 import BeautifulSoup
 # http://stackoverflow.com/questions/11339955/python-string-encode-decode
-f = open(fname, "r")
-html = f.read()
+html = open(fname, "r").read()
 
 # from
 # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
 soup = BeautifulSoup(html, 'html.parser', from_encoding="utf-8")
+print("done")
 
-print(soup.prettify())
+sessiontimes = list(set(soup.find_all('font', "sessionTime"))).sort()
 #+END_SRC
 
 #+RESULTS:
