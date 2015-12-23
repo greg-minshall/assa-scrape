@@ -1,0 +1,48 @@
+[[http://www.crummy.com/software/BeautifulSoup/][BeautifulSoup]]
+
+
+#+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html"
+import codecs
+from bs4 import BeautifulSoup
+
+f = codecs.open(fname, "r", "latin1");
+html = f.read()
+
+soup = BeautifulSoup(html, 'html.parser')
+
+print(soup.prettify())
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC python :var html="file:aea-2016-assa-prelim.html"
+# http://stackoverflow.com/questions/19460403/html-file-parsing-in-python
+from bs4 import BeautifulSoup
+from pprint import pprint
+
+soup = BeautifulSoup(html)
+h2s = soup.select("h2") #get all h2 elements
+tables = soup.select("table") #get all tables
+
+first = True
+title =""
+players = []
+for i,table in enumerate(tables):
+    if first:
+         #every h2 element has 2 tables. table size = 8, h2 size = 4
+         #so for every 2 tables 1 h2
+         title =  h2s[int(i/2)].text
+    for tr in table.select("tr"):
+        player = (title,) #create a player
+        for td in tr.select("td"):
+            player = player + (td.text,) #add td info in the player
+        if len(player) > 1: 
+            #If the tr contains a player and its not only ("Goalkeaper") add it
+            players.append(player)
+    first = not first
+pprint(players)
+#+END_SRC
+
+#+RESULTS:
+: None
