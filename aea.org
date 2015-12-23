@@ -38,8 +38,6 @@ go to L3
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
   cur = soup.find("font", "dayHeader");
   # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
-  for lb in soup.find_all("br"):
-      print(lb.extract())
   while (cur['class'] == [u'dayHeader']):
       cur = cur.next_sibling
       while (cur['class'] == [u'sessionTime']):
@@ -74,6 +72,7 @@ go to L3
   html = open(fname, "r").read()
 
   # need to get rid of <hr>, <br> (mess up beautifulsoup)
+  # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
 
   html = html.replace("<br>", "")
   html = html.replace("<hr>", "")
@@ -87,7 +86,6 @@ go to L3
 #+END_SRC
 
 #+RESULTS:
-: None
 
 
 #+BEGIN_SRC python :var html="file:aea-2016-assa-prelim.html"
