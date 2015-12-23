@@ -36,10 +36,13 @@ collect abstract
 go to L3
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
-  days = soup("font", "dayHeader");
-  while (cur['class'] == u'dayHeader'):
+  cur = soup.find("font", "dayHeader");
+  # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
+  for lb in soup.find_all("br"):
+      print(lb.extract())
+  while (cur['class'] == [u'dayHeader']):
       cur = cur.next_sibling
-      while (cur['class'] == u'sessionTime'):
+      while (cur['class'] == [u'sessionTime']):
           cur = cur.next_sibling
           assert cur['class'] == u'sessionLocation', "expected u'sessionLocation', got %s" % cur['class']
           cur = cur.next_sibling
@@ -56,27 +59,35 @@ go to L3
               cur = cur.next_sibling
               while (cur['class'] == u'author'):
                   # XXX descend to get name, affiliation
+                  print cur
               id = cur['id']
               cur = cur.next_sibling
 #+END_SRC
 
+#+RESULTS:
+: None
+
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
-import codecs
-import sys
-from bs4 import BeautifulSoup
-# http://stackoverflow.com/questions/11339955/python-string-encode-decode
-html = open(fname, "r").read()
+  from bs4 import BeautifulSoup
+  # http://stackoverflow.com/questions/11339955/python-string-encode-decode
+  html = open(fname, "r").read()
 
-# from
-# http://www.crummy.com/software/BeautifulSoup/bs4/doc/
-soup = BeautifulSoup(html, 'html.parser', from_encoding="utf-8")
-print("done")
+  # need to get rid of <hr>, <br> (mess up beautifulsoup)
 
-sessiontimes = list(set(soup.find_all('font', "sessionTime"))).sort()
+  html = html.replace("<br>", "")
+  html = html.replace("<hr>", "")
+
+  # from
+  # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
+  soup = BeautifulSoup(html, 'html.parser', from_encoding="utf-8")
+  print("done")
+
+  sessiontimes = list(set(soup.find_all('font', "sessionTime"))).sort()
 #+END_SRC
 
 #+RESULTS:
+: None
 
 
 #+BEGIN_SRC python :var html="file:aea-2016-assa-prelim.html"
