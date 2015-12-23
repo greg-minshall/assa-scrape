@@ -36,29 +36,47 @@ collect abstract
 go to L3
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
-  cur = soup.find_all
-  while (cur['class'] == u'dayHeader'):
+  def dodays(days):
+      for day in days:
+          dosessions(day)
+
+  def dosessions(day):
+      sessions = day("font", "sessionTime")
+      for session in sessions:
+          dosession(day, session)
+
+  def dosession(day, session):
+      cur = session.next_sibling
+      assert cur['class'] == u'sessionLocation', "expected u'sessionLocation', got %s" % cur['class']
       cur = cur.next_sibling
-      while (cur['class'] == u'sessionTime'):
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionLocation', "expected u'sessionLocation', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionSource', "expected u'sessionSource', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionTitle', "expected u'sessionTitle', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'presiding', "expected u'presiding', got %s" % cur['class']
-          # XXX descend to get name, affiliation
-          cur = cur.next_sibling
-          while (cur['class'] == u'paper'):
-              cur = cur.next_sibling
-              assert cur['class'] == u'paperTitle', "expected u'paperTitle, got %s" % cur['class']
-              cur = cur.next_sibling
-              while (cur['class'] == u'author'):
-                  # XXX descend to get name, affiliation
-              id = cur['id']
-              cur = cur.next_sibling
+      assert cur['class'] == u'sessionSource', "expected u'sessionSource', got %s" % cur['class']
+      cur = cur.next_sibling
+      assert cur['class'] == u'sessionTitle', "expected u'sessionTitle', got %s" % cur['class']
+      cur = cur.next_sibling
+      assert cur['class'] == u'presiding', "expected u'presiding', got %s" % cur['class']
+      # XXX descend to get name, affiliation
+
+      papers = cur("div", "paper")
+      for paper in papers:
+          dopaper(day, session, paper)
+
+  def dopaper(day, session, paper):
+      cur = cur.next_sibling
+      assert cur['class'] == u'paperTitle', "expected u'paperTitle, got %s" % cur['class']
+      authors = cur("div", "author")
+      for author in authors:
+          doauthor(day, session, paper, author)
+
+  def doauthor(day, session, paper, author):
+      # XXX descend to get name, affiliation
+      id = cur['id']
+      cur = cur.next_sibling
+
+  days = soup("font", "dayHeader");
+  dodays(days)
 #+END_SRC
+
+#+RESULTS:
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
