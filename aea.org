@@ -38,11 +38,13 @@ go to L3
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
   def dodays(days):
       for day in days:
+          print(day);
           dosessions(day)
 
   def dosessions(day):
       sessions = day("font", "sessionTime")
       for session in sessions:
+          print(session);
           dosession(day, session)
 
   def dosession(day, session):
@@ -61,6 +63,7 @@ go to L3
           dopaper(day, session, paper)
 
   def dopaper(day, session, paper):
+      print(paper)
       cur = cur.next_sibling
       assert cur['class'] == u'paperTitle', "expected u'paperTitle, got %s" % cur['class']
       authors = cur("div", "author")
@@ -68,6 +71,7 @@ go to L3
           doauthor(day, session, paper, author)
 
   def doauthor(day, session, paper, author):
+      print(author)
       # XXX descend to get name, affiliation
       id = cur['id']
       cur = cur.next_sibling
@@ -77,6 +81,7 @@ go to L3
 #+END_SRC
 
 #+RESULTS:
+: <function dodays at 0x1070a7578>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
