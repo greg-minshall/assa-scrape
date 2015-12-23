@@ -35,6 +35,31 @@ collect authors
 collect abstract
 go to L3
 
+#+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
+  cur = soup.find_all
+  while (cur['class'] == u'dayHeader'):
+      cur = cur.next_sibling
+      while (cur['class'] == u'sessionTime'):
+          cur = cur.next_sibling
+          assert cur['class'] == u'sessionLocation', "expected u'sessionLocation', got %s" % cur['class']
+          cur = cur.next_sibling
+          assert cur['class'] == u'sessionSource', "expected u'sessionSource', got %s" % cur['class']
+          cur = cur.next_sibling
+          assert cur['class'] == u'sessionTitle', "expected u'sessionTitle', got %s" % cur['class']
+          cur = cur.next_sibling
+          assert cur['class'] == u'presiding', "expected u'presiding', got %s" % cur['class']
+          # XXX descend to get name, affiliation
+          cur = cur.next_sibling
+          while (cur['class'] == u'paper'):
+              cur = cur.next_sibling
+              assert cur['class'] == u'paperTitle', "expected u'paperTitle, got %s" % cur['class']
+              cur = cur.next_sibling
+              while (cur['class'] == u'author'):
+                  # XXX descend to get name, affiliation
+              id = cur['id']
+              cur = cur.next_sibling
+#+END_SRC
+
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
 import codecs
