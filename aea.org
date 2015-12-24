@@ -43,36 +43,43 @@ go to L3
       x = cur.next_sibling;
       while type(x).__name__ == "NavigableString":
           x = x.next_sibling
-      return x;
+      print x.string
+      return x
 
-  cur = soup.find("font", "dayHeader");
-  # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
-  while (cur['class'] == [u'dayHeader']):
-      cur = nextsib(cur)
-      while (cur['class'] == [u'sessionTime']):
+  def nameaffil(cur):             # XXX descend to get name, affiliation
+      kind = cur[u'class'];
+      name = cur.find("font", "name");
+      while cur['class'] == kind:
           cur = nextsib(cur)
-          mass(cur, u'sessionLocation')
+      mass(cur, u'affiliation')
+
+  def campbells(soup):
+      cur = soup.find("font", "dayHeader");
+      # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
+      while (cur['class'] == [u'dayHeader']):
           cur = nextsib(cur)
-          mass(cur, u'sessionSource')
-          cur = nextsib(cur)
-          mass(cur, u'sessionTitle')
-          cur = nextsib(cur)
-          mass(cur, u'presiding')
-          # XXX descend to get name, affiliation
-          cur = nextsib(cur)
-          while (cur['class'] == u'paper'):
+          while (cur['class'] == [u'sessionTime']):
               cur = nextsib(cur)
-              mass(cur, u'paperTitle')
+              mass(cur, u'sessionLocation')
               cur = nextsib(cur)
-              while (cur['class'] == u'author'):
-                  # XXX descend to get name, affiliation
-                  print cur
-              id = cur['id']
+              mass(cur, u'sessionSource')
               cur = nextsib(cur)
+              mass(cur, u'sessionTitle')
+              cur = nextsib(cur)
+              mass(cur, u'presiding')
+              nameaffil(cur)
+              cur = nextsib(cur)
+              while (cur['class'] == u'paper'):
+                  cur = nextsib(cur)
+                  mass(cur, u'paperTitle')
+                  cur = nextsib(cur)
+                  while (cur['class'] == u'author'):
+                      nameaffil(cur)
+                  id = cur['id']
+                  cur = nextsib(cur)
 #+END_SRC
 
 #+RESULTS:
-: <font class="sessionLocation">, Hilton Union Square, Plaza A</font>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
