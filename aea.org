@@ -49,9 +49,8 @@ go to L3
   def nameaffil(cur):             # XXX descend to get name, affiliation
       kind = cur[u'class'];
       name = cur.find("font", "name");
-      while cur['class'] == kind:
-          cur = nextsib(cur)
-      mass(cur, u'affiliation')
+      affil = nextsib(name)
+      mass(affil, u'affiliation')
 
   def campbells(soup):
       cur = soup.find("font", "dayHeader");
