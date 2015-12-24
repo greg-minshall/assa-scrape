@@ -51,9 +51,11 @@ go to L3
       name = cur.find("font", "name");
       affil = nextsib(name)
       mass(affil, u'affiliation')
+      (name, affil)
 
   def campbells(soup):
       cur = soup.find("font", "dayHeader");
+      print cur.string            # XXX
       # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
       while (cur['class'] == [u'dayHeader']):
           cur = nextsib(cur)
