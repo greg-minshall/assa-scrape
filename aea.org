@@ -43,41 +43,50 @@ go to L3
       x = cur.next_sibling;
       while type(x).__name__ == "NavigableString":
           x = x.next_sibling
-      print x.string
+      print x.contents[0].string
       return x
 
   def nameaffil(cur):             # XXX descend to get name, affiliation
-      kind = cur[u'class'];
-      name = cur.find("font", "name");
+      kind = cur[u'class']
+      name = cur.find("font", "name")
+      print name.contents[0].string
       affil = nextsib(name)
       mass(affil, u'affiliation')
       (name, affil)
 
   def campbells(soup):
-      cur = soup.find("font", "dayHeader");
-      print cur.string            # XXX
+      global dayheader, stime, slocation, ssource, stitle
+      global presiding, panelist, paper, ptitle, author, id
+      dayheader = soup.find("font", "dayHeader")
+      print dayheader.string            # XXX
       # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
-      while (cur['class'] == [u'dayHeader']):
-          cur = nextsib(cur)
-          while (cur['class'] == [u'sessionTime']):
-              cur = nextsib(cur)
-              mass(cur, u'sessionLocation')
-              cur = nextsib(cur)
-              mass(cur, u'sessionSource')
-              cur = nextsib(cur)
-              mass(cur, u'sessionTitle')
-              cur = nextsib(cur)
-              mass(cur, u'presiding')
-              nameaffil(cur)
-              cur = nextsib(cur)
-              while (cur['class'] == u'paper'):
-                  cur = nextsib(cur)
-                  mass(cur, u'paperTitle')
-                  cur = nextsib(cur)
-                  while (cur['class'] == u'author'):
-                      nameaffil(cur)
-                  id = cur['id']
-                  cur = nextsib(cur)
+      while (dayheader['class'] == [u'dayHeader']):
+          stime = nextsib(dayheader)
+          while (stime['class'] == [u'sessionTime']):
+              slocation = nextsib(stime)
+              mass(slocation, u'sessionLocation')
+              ssource = nextsib(slocation)
+              mass(ssource, u'sessionSource')
+              stitle = nextsib(ssource)
+              mass(stitle, u'sessionTitle')
+              presiding = nextsib(stitle)
+              mass(presiding, u'presiding')
+              nameaffil(presiding)
+              panelist = nextsib(presiding)
+              while (panelist['class'] == [u'panelist']):
+                  nameaffil(panelist)
+                  panelist = nextsib(panelist)
+              paper = panelist    # wasn't a panelist, so
+              while (paper['class'] == [u'paper']):
+                  ptitle = nextsib(paper)
+                  mass(ptitle, u'paperTitle')
+                  author = nextsib(ptitle)
+                  while (author['class'] == [u'author']):
+                      nameaffil(author)
+                  id = ptitle['id']
+                  paper = nextsib(id)
+              stime = paper       # wasn't a paper, so...
+          dayheader = stime       # wasn't session time, so...
 #+END_SRC
 
 #+RESULTS:
