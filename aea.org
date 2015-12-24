@@ -36,34 +36,43 @@ collect abstract
 go to L3
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
+  def mass(cur, expected):
+      assert cur['class'] == [expected], "expected %s, got %s" % (expected, cur['class'])
+
+  def nextsib(cur):
+      x = cur.next_sibling;
+      while type(x).__name__ == "NavigableString":
+          x = x.next_sibling
+      return x;
+
   cur = soup.find("font", "dayHeader");
   # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
   while (cur['class'] == [u'dayHeader']):
-      cur = cur.next_sibling
+      cur = nextsib(cur)
       while (cur['class'] == [u'sessionTime']):
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionLocation', "expected u'sessionLocation', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionSource', "expected u'sessionSource', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'sessionTitle', "expected u'sessionTitle', got %s" % cur['class']
-          cur = cur.next_sibling
-          assert cur['class'] == u'presiding', "expected u'presiding', got %s" % cur['class']
+          cur = nextsib(cur)
+          mass(cur, u'sessionLocation')
+          cur = nextsib(cur)
+          mass(cur, u'sessionSource')
+          cur = nextsib(cur)
+          mass(cur, u'sessionTitle')
+          cur = nextsib(cur)
+          mass(cur, u'presiding')
           # XXX descend to get name, affiliation
-          cur = cur.next_sibling
+          cur = nextsib(cur)
           while (cur['class'] == u'paper'):
-              cur = cur.next_sibling
-              assert cur['class'] == u'paperTitle', "expected u'paperTitle, got %s" % cur['class']
-              cur = cur.next_sibling
+              cur = nextsib(cur)
+              mass(cur, u'paperTitle')
+              cur = nextsib(cur)
               while (cur['class'] == u'author'):
                   # XXX descend to get name, affiliation
                   print cur
               id = cur['id']
-              cur = cur.next_sibling
+              cur = nextsib(cur)
 #+END_SRC
 
 #+RESULTS:
-: None
+: <font class="sessionLocation">, Hilton Union Square, Plaza A</font>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
