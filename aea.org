@@ -36,11 +36,21 @@ collect abstract
 go to L3
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
-  def prstring(cur):
+  def rstring(cur):
       try:
-          print cur.contents[0].string
-      except:
-          pass
+          if type(cur.contents[0]).__name__ == "NavigableString":
+              return cur.string
+          else:
+              return ""
+      # http://stackoverflow.com/a/730778
+      except Exception:
+          return ""
+
+  def rclass(cur):
+      try:
+          return cur['class']
+      except Exception:
+          return ""
 
   def mass(cur, expected):
       assert cur['class'] == [expected], "expected %s, got %s" % (expected, cur['class'])
@@ -49,13 +59,11 @@ go to L3
       x = cur.next_sibling;
       while type(x).__name__ == "NavigableString":
           x = x.next_sibling
-      prstring(x)
       return x
 
   def nameaffil(cur):             # XXX descend to get name, affiliation
       kind = cur[u'class']
       name = cur.find("font", "name")
-      prstring(name)
       affil = nextsib(name)
       mass(affil, u'affiliation')
       (name, affil)
@@ -64,7 +72,6 @@ go to L3
       global dayheader, stime, slocation, ssource, stitle
       global presiding, panelist, paper, ptitle, author, id
       dayheader = soup.find(class_="dayHeader")
-      prstring(dayheader)         # XXX
       # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
       while (dayheader['class'] == [u'dayHeader']):
           stime = nextsib(dayheader)
@@ -100,19 +107,15 @@ go to L3
           if type(child).__name__ == "NavigableString":
               return nextsib(child)
           else:
-              prstring(child)
               return child
-      except:
+      except Exception:
           pass
 
   def walk(me):
-      global child
       while me:
-          prstring(me)
-          child = firstchild(me)
-          if child:
-              walk(child)
-          me = me.next_sibling
+          print "%s:  %s" % (rclass(me), rstring(me))
+          walk(firstchild(me))    # go down
+          me = nextsib(me)        # continue this level
 
 
 #+END_SRC
