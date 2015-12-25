@@ -35,6 +35,20 @@ collect authors
 collect abstract
 go to L3
 
+for layout:
+
+- dayHeader: **
+- sessionTime: ***
+- session (Time, Location, Source, Title, presiding, panelist}: ****
+  so, duplicate sessionTime, to get info closer to reader
+- each paper (Title, author): *****
+- abstract (hyperlink): ******
+
+when get, e.g., new sessionTime, check to see if same as current.  if
+same, don't emit anything; else, emit a new "** Session time: %"
+
+but, alternative doc would have "Source" at second level.
+
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
   def rstring(cur):
       try:
