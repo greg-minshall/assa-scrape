@@ -58,20 +58,26 @@ but, alternative doc would have "Source" at second level.
 | paper   | *****  |
 
 #+name: tags
-| tag             | section |
-|-----------------+---------|
-| dayHeader       | day     |
-| sessionTime     | time    |
-| sessionLocation | session |
-| sessionSource   | session |
-| sessionTitle    | session |
-| presiding       | session |
-| panelist        | session |
-| paper           | paper   |
-| paperTitle      | paper   |
-| author          | paper   |
-| hyperlink       | paper   |
-
+| tag                | section     |
+|--------------------+-------------|
+| dayHeader          | day         |
+| sessionTime        | time        |
+| sessionLocation    | session     |
+| sessionSource      | session     |
+| sessionTitle       | session     |
+| presiding          | session     |
+| panelist           | session     |
+| topic              | session     |
+| sessionJEL         | session     |
+| sessionType        | session     |
+| paper              | paper       |
+| paperTitle         | paper       |
+| author             | paper       |
+| hyperlink          | paper       |
+| name               |             |
+| affiliation        |             |
+| discussantsSection | postsession |
+| discussant         | postsession |
   
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var tags=tags
@@ -87,7 +93,7 @@ but, alternative doc would have "Source" at second level.
 
   def rclass(cur):
       try:
-          return cur['class']
+          return cur['class'][0]
       except Exception:
           return ""
 
@@ -150,17 +156,25 @@ but, alternative doc would have "Source" at second level.
       except Exception:
           pass
 
+  def listtodict(l):
+      a = {}
+      for i in l:
+          a[i[0]] = i[1]
+      return a
+
   def walk(me, level=""):
       while me:
           print "%s%s:  %s" % (level, rclass(me), rstring(me))
+          print "%s%s:  %s" % (level, tags[rclass(me)], rstring(me))
           walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
-
+  tags = listtodict(tags)
+  tags[''] = ''                   # XXX
+  sections = listtodict(sections)
 #+END_SRC
 
 #+RESULTS:
-: <class 'bs4.element.Tag'>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
