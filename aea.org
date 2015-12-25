@@ -49,7 +49,32 @@ same, don't emit anything; else, emit a new "** Session time: %"
 
 but, alternative doc would have "Source" at second level.
 
-#+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
+#+name: sections
+| section | marker |
+|---------+--------|
+| day     | **     |
+| time    | ***    |
+| session | ****   |
+| paper   | *****  |
+
+#+name: tags
+| tag             | section |
+|-----------------+---------|
+| dayHeader       | day     |
+| sessionTime     | time    |
+| sessionLocation | session |
+| sessionSource   | session |
+| sessionTitle    | session |
+| presiding       | session |
+| panelist        | session |
+| paper           | paper   |
+| paperTitle      | paper   |
+| author          | paper   |
+| hyperlink       | paper   |
+
+  
+
+#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var tags=tags
   def rstring(cur):
       try:
           if (type(cur.contents[0]).__name__ == "NavigableString") & (len(cur.contents) == 1):
@@ -135,6 +160,7 @@ but, alternative doc would have "Source" at second level.
 #+END_SRC
 
 #+RESULTS:
+: <class 'bs4.element.Tag'>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
