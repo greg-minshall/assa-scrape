@@ -50,12 +50,13 @@ same, don't emit anything; else, emit a new "** Session time: %"
 but, alternative doc would have "Source" at second level.
 
 #+name: sections
-| section | marker |
-|---------+--------|
-| day     | **     |
-| time    | ***    |
-| session | ****   |
-| paper   | *****  |
+| section     | marker |
+|-------------+--------|
+| day         | **     |
+| time        | ***    |
+| session     | ****   |
+| paper       | *****  |
+| postsession | ****   |
 
 #+name: tags
 | tag                | section     |
@@ -164,14 +165,17 @@ but, alternative doc would have "Source" at second level.
 
   def walk(me, level=""):
       while me:
-          print "%s%s:  %s" % (level, rclass(me), rstring(me))
+          # print "%s%s:  %s" % (level, rclass(me), rstring(me))
           print "%s%s:  %s" % (level, tags[rclass(me)], rstring(me))
+          t = tags[rclass(me)]
+          s = sections[t]
           walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
   tags = listtodict(tags)
   tags[''] = ''                   # XXX
   sections = listtodict(sections)
+  sections[''] = ''
 #+END_SRC
 
 #+RESULTS:
@@ -185,8 +189,10 @@ but, alternative doc would have "Source" at second level.
   # need to get rid of <hr>, <br> (mess up beautifulsoup)
   # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
 
-  html = html.replace("<br>", "")
-  html = html.replace("<hr>", "")
+  # and, <strong>, <em>, seem to get in our way (by making cur.string =
+  # "", needing to descend
+  for i in ["<br>", "<hr>", "<strong>", "</strong>", "<em>", "</em>"]:
+      html = html.replace(i, "")
 
   # from
   # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
