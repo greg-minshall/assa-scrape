@@ -111,10 +111,10 @@ go to L3
       except Exception:
           pass
 
-  def walk(me):
+  def walk(me, level=""):
       while me:
-          print "%s:  %s" % (rclass(me), rstring(me))
-          walk(firstchild(me))    # go down
+          print "%s%s:  %s" % (level, rclass(me), rstring(me))
+          walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
 
