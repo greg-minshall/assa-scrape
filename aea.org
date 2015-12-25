@@ -191,6 +191,8 @@ but, alternative doc would have "Source" at second level.
 
   # and, <strong>, <em>, seem to get in our way (by making cur.string =
   # "", needing to descend
+
+  # XXX -- should be some more general way of doing this!
   for i in ["<br>", "<hr>", "<strong>", "</strong>", "<em>", "</em>"]:
       html = html.replace(i, "")
 
