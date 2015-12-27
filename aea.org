@@ -87,7 +87,7 @@ but, alternative doc would have "Source" at second level.
 
   def in_day(cur):
       cur_day = rstring(cur)
-      print markers['day'], cur_day
+      print markers['day'][0], cur_day
 
   def end_day():
       pass
@@ -97,26 +97,33 @@ but, alternative doc would have "Source" at second level.
 
   def in_time(cur):
       cur_time = rstring(cur)
-      pass
+      print markers['time'][0], cur_time
 
   def end_time():
       pass
 
   def begin_session():
-      del session
+      global session
+      session = {}
 
   def in_session(cur):
       cl = rclass(cur)
       session[cl] = cur
+      if cl == 'sessionTitle':
+          print markers['session'][0], cur.contents[0].string.strip()
 
   def end_session():
       pass
 
   def begin_paper():
-      del paper
+      global paper
+      paper = {}
 
   def in_paper(cur):
-      pass
+      cl = rclass(cur)
+      paper[cl] = cur
+      if cl == 'paperTitle':
+          print markers['paper'][0], cur.contents[0].string.strip()
 
   def end_paper():
       pass
@@ -135,7 +142,7 @@ but, alternative doc would have "Source" at second level.
   def rstring(cur):
       try:
           if (type(cur.contents[0]).__name__ == "NavigableString") & (len(cur.contents) == 1):
-              return cur.string
+              return cur.string.strip()
           else:
               return ""
       # http://stackoverflow.com/a/730778
@@ -174,16 +181,17 @@ but, alternative doc would have "Source" at second level.
   def listtodict(l):
       a = {}
       for i in l:
-          a[i[0]] = i[1]
+          a[i[0]] = i[1:]
       return a
 
   def walk(me, level=""):
-      global lastsection, section
+      global lastsection, section, lastme
       while me:
+          lastme = me
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
           class_ = rclass(me)
-          section = sections[class_]
+          section = sections[class_][0]
           if section == "":
               section = lastsection
           if section != lastsection: # changing section
@@ -197,10 +205,11 @@ but, alternative doc would have "Source" at second level.
           me = nextsib(me)        # continue this level
 
 
+  lastsection = ""
   sections = listtodict(sections)
-  sections[''] = ''               # XXX
-  #markers = listtodict(markers)
-  #markers[''] = ''                # XXX
+  sections[''] = ['', 'n']        # XXX
+  markers = listtodict(markers)
+  markers[''] = ''                # XXX
 #+END_SRC
 
 #+RESULTS:
