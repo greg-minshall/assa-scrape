@@ -49,7 +49,7 @@ same, don't emit anything; else, emit a new "** Session time: %"
 
 but, alternative doc would have "Source" at second level.
 
-#+name: sections
+#+name: markers
 | section     | marker |
 |-------------+--------|
 | day         | **     |
@@ -58,30 +58,80 @@ but, alternative doc would have "Source" at second level.
 | paper       | *****  |
 | postsession | ****   |
 
-#+name: tags
-| tag                | section     |
-|--------------------+-------------|
-| dayHeader          | day         |
-| sessionTime        | time        |
-| sessionLocation    | session     |
-| sessionSource      | session     |
-| sessionTitle       | session     |
-| presiding          | session     |
-| panelist           | session     |
-| topic              | session     |
-| sessionJEL         | session     |
-| sessionType        | session     |
-| paper              | paper       |
-| paperTitle         | paper       |
-| author             | paper       |
-| hyperlink          | paper       |
-| name               |             |
-| affiliation        |             |
-| discussantsSection | postsession |
-| discussant         | postsession |
+#+name: sections
+| tag                | section     | beginning |
+|--------------------+-------------+-----------|
+| dayHeader          | day         | y         |
+| sessionTime        | time        | y         |
+| sessionLocation    | session     | y         |
+| sessionSource      | session     | n         |
+| sessionTitle       | session     | n         |
+| presiding          | session     | n         |
+| panelist           | session     | n         |
+| topic              | session     | n         |
+| sessionJEL         | session     | n         |
+| sessionType        | session     | n         |
+| paper              | paper       | y         |
+| paperTitle         | paper       | n         |
+| author             | paper       | n         |
+| hyperlink          | paper       | n         |
+| name               |             |           |
+| affiliation        |             |           |
+| discussantsSection | postsession | y         |
+| discussant         | postsession | n         |
   
 
-#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var tags=tags
+#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var markers=markers
+  def begin_day():
+      pass
+
+  def in_day(cur):
+      cur_day = rstring(cur)
+      print markers['day'], cur_day
+
+  def end_day():
+      pass
+
+  def begin_time():
+      pass
+
+  def in_time(cur):
+      cur_time = rstring(cur)
+      pass
+
+  def end_time():
+      pass
+
+  def begin_session():
+      del session
+
+  def in_session(cur):
+      cl = rclass(cur)
+      session[cl] = cur
+
+  def end_session():
+      pass
+
+  def begin_paper():
+      del paper
+
+  def in_paper(cur):
+      pass
+
+  def end_paper():
+      pass
+
+  def begin_postsession():
+      pass
+
+  def in_postsession(cur):
+      pass
+
+  def end_postsession():
+      pass
+
+  # this is the non-semantic part of our process
+
   def rstring(cur):
       try:
           if (type(cur.contents[0]).__name__ == "NavigableString") & (len(cur.contents) == 1):
@@ -98,9 +148,6 @@ but, alternative doc would have "Source" at second level.
       except Exception:
           return ""
 
-  def mass(cur, expected):
-      assert cur['class'] == [expected], "expected %s, got %s" % (expected, cur['class'])
-
   def nextsib(cur):
       x = cur.next_sibling;
       while type(x).__name__ == "NavigableString":
@@ -113,39 +160,6 @@ but, alternative doc would have "Source" at second level.
       affil = nextsib(name)
       mass(affil, u'affiliation')
       (name, affil)
-
-  def campbells(soup):
-      global dayheader, stime, slocation, ssource, stitle
-      global presiding, panelist, paper, ptitle, author, id
-      dayheader = soup.find(class_="dayHeader")
-      # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
-      while (dayheader['class'] == [u'dayHeader']):
-          stime = nextsib(dayheader)
-          while (stime['class'] == [u'sessionTime']):
-              slocation = nextsib(stime)
-              mass(slocation, u'sessionLocation')
-              ssource = nextsib(slocation)
-              mass(ssource, u'sessionSource')
-              stitle = nextsib(ssource)
-              mass(stitle, u'sessionTitle')
-              presiding = nextsib(stitle)
-              mass(presiding, u'presiding')
-              nameaffil(presiding)
-              panelist = nextsib(presiding)
-              while (panelist['class'] == [u'panelist']):
-                  nameaffil(panelist)
-                  panelist = nextsib(panelist)
-              paper = panelist    # wasn't a panelist, so
-              while (paper['class'] == [u'paper']):
-                  ptitle = nextsib(paper)
-                  mass(ptitle, u'paperTitle')
-                  author = nextsib(ptitle)
-                  while (author['class'] == [u'author']):
-                      nameaffil(author)
-                  id = ptitle['id']
-                  paper = nextsib(id)
-              stime = paper       # wasn't a paper, so...
-          dayheader = stime       # wasn't session time, so...
 
   def firstchild(cur):
       try:
@@ -164,18 +178,29 @@ but, alternative doc would have "Source" at second level.
       return a
 
   def walk(me, level=""):
+      global lastsection, section
       while me:
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
-          print "%s%s:  %s" % (level, tags[rclass(me)], rstring(me))
-          t = tags[rclass(me)]
-          s = sections[t]
+          # print "%s%s:  %s" % (level, rclass(me), rstring(me))
+          class_ = rclass(me)
+          section = sections[class_]
+          if section == "":
+              section = lastsection
+          if section != lastsection: # changing section
+              if lastsection != "":
+                  eval("end_%s()" % lastsection) # end the previous section
+              lastsection = section
+              eval("begin_%s()" % section)       # start the new section
+          eval("in_%s(me)" % section)
+          # print "%s%s:  %s" % (level, class_, rstring(me))
           walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
-  tags = listtodict(tags)
-  tags[''] = ''                   # XXX
+
   sections = listtodict(sections)
-  sections[''] = ''
+  sections[''] = ''               # XXX
+  #markers = listtodict(markers)
+  #markers[''] = ''                # XXX
 #+END_SRC
 
 #+RESULTS:
