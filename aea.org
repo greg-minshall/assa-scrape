@@ -59,45 +59,29 @@ but, alternative doc would have "Source" at second level.
 | postsession | ****   |
 
 #+name: sections
-| tag                | section     |
-|--------------------+-------------|
-| dayHeader          | day         |
-| sessionTime        | time        |
-| sessionLocation    | session     |
-| sessionSource      | session     |
-| sessionTitle       | session     |
-| presiding          | session     |
-| panelist           | session     |
-| topic              | session     |
-| sessionJEL         | session     |
-| sessionType        | session     |
-| paper              | paper       |
-| paperTitle         | paper       |
-| author             | paper       |
-| hyperlink          | paper       |
-| name               |             |
-| affiliation        |             |
-| discussantsSection | postsession |
-| discussant         | postsession |
+| tag                | section     | marker |
+|--------------------+-------------+--------|
+| dayHeader          | day         | **     |
+| sessionTime        | time        | ***    |
+| sessionTitle       | session     | ****   |
+| topic              | session     | *****  |
+| sessionJEL         | session     |        |
+| sessionSource      | session     | -      |
+| sessionType        | session     |        |
+| sessionLocation    | session     | -      |
+| presiding          | session     | -      |
+| panelist           | session     | -      |
+| paper              | paper       |        |
+| paperTitle         | paper       | *****  |
+| author             | paper       | -      |
+| hyperlink          | paper       | ****** |
+| name               |             |        |
+| affiliation        |             |        |
+| discussantsSection | postsession | *****  |
+| discussant         | postsession |        |
 
 
-#+BEGIN_EXAMPLE
-| ** $dayHeader  
-| *** $sessionTime
-| **** $sessionTitle
-| ***** $topic
-| - $sessionJEL
-| - $sessionSource
-| - $sessionType
-| - $sessionLocation
-| - $presiding
-| [- $panelist]
-| ***** $paperTitle
-| - $author
-| ****** abstract
-| $abstract
-| *** $discussant
-#+END_EXAMPLE
+*** $discussant
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var markers=markers
   def begin_day():
@@ -124,18 +108,33 @@ but, alternative doc would have "Source" at second level.
   def end_time():
       pass
 
+  # session.format = 
+  # "**** $sessionTitle
+  # - $sessionJEL
+  # - $sessionSource
+  # - $sessionType
+  # - $sessionLocation
+  # - presiding: $presiding
+  # [- $panelist]*\n"
+
   def begin_session():
       global session
       session = {}
 
   def in_session(cur):
-      cl = rclass(cur)
-      session[cl] = cur
-      if cl == 'sessionTitle':
-          print markers['session'][0], cur.contents[0].string.strip()
+      session[rclass(cur)] = cur
 
   def end_session():
-      pass
+      if 'sessionTitle' in session:
+          print "%s %s" % (sections['sessionTitle'][1], session['sessionTitle'])
+      else:
+          print "%s <unnamed session>" % markers['session'][0]
+
+  # paper.format =
+  # "***** $paperTitle
+  # - $name ($affiliation)
+  # ****** abstract
+  # $abstract
 
   def begin_paper():
       global paper
@@ -151,19 +150,35 @@ but, alternative doc would have "Source" at second level.
       pass
 
   def begin_postsession():
-      pass
+      global postsession
+      postsession = []
 
   def in_postsession(cur):
-      pass
+      global postsession
+      postsession = postsession + [cur]
 
   def end_postsession():
-      pass
+      if "postsession" in globals():
+          global postsession
+          print "in end_postsession"
+          dprefix = sections['discussantsSection'][1]
+          for dsection in postsession:
+              for d in dsection.children:      # discussant
+                  if not navigablestring(d):
+                      if rclass(d) != "discussant":
+                          print d, " class: ", rclass(d), type(d), type(d).__name__, navigablestring(d)
+                          raise NotImplementedError
+                      print dprefix, "discussant:", nameaffil(d)
 
   # this is the non-semantic part of our process
 
+  def navigablestring(cur):
+      return type(cur).__name__ == "NavigableString"
+
+
   def rstring(cur):
       try:
-          if (type(cur.contents[0]).__name__ == "NavigableString") & (len(cur.contents) == 1):
+          if navigablestring(cur.contents[0]) & (len(cur.contents) == 1):
               return cur.string.strip()
           else:
               return ""
@@ -223,7 +238,7 @@ but, alternative doc would have "Source" at second level.
               eval("begin_%s()" % section)       # start the new section
           eval("in_%s(me)" % section)
           # print "%s%s:  %s" % (level, class_, rstring(me))
-          walk(firstchild(me), level+" ")    # go down
+          # walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
 
@@ -238,6 +253,7 @@ but, alternative doc would have "Source" at second level.
 #+END_SRC
 
 #+RESULTS:
+: 4
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
