@@ -59,35 +59,55 @@ but, alternative doc would have "Source" at second level.
 | postsession | ****   |
 
 #+name: sections
-| tag                | section     | beginning |
-|--------------------+-------------+-----------|
-| dayHeader          | day         | y         |
-| sessionTime        | time        | y         |
-| sessionLocation    | session     | y         |
-| sessionSource      | session     | n         |
-| sessionTitle       | session     | n         |
-| presiding          | session     | n         |
-| panelist           | session     | n         |
-| topic              | session     | n         |
-| sessionJEL         | session     | n         |
-| sessionType        | session     | n         |
-| paper              | paper       | y         |
-| paperTitle         | paper       | n         |
-| author             | paper       | n         |
-| hyperlink          | paper       | n         |
-| name               |             |           |
-| affiliation        |             |           |
-| discussantsSection | postsession | y         |
-| discussant         | postsession | n         |
-  
+| tag                | section     |
+|--------------------+-------------|
+| dayHeader          | day         |
+| sessionTime        | time        |
+| sessionLocation    | session     |
+| sessionSource      | session     |
+| sessionTitle       | session     |
+| presiding          | session     |
+| panelist           | session     |
+| topic              | session     |
+| sessionJEL         | session     |
+| sessionType        | session     |
+| paper              | paper       |
+| paperTitle         | paper       |
+| author             | paper       |
+| hyperlink          | paper       |
+| name               |             |
+| affiliation        |             |
+| discussantsSection | postsession |
+| discussant         | postsession |
+
+
+#+BEGIN_EXAMPLE
+| ** $dayHeader  
+| *** $sessionTime
+| **** $sessionTitle
+| ***** $topic
+| - $sessionJEL
+| - $sessionSource
+| - $sessionType
+| - $sessionLocation
+| - $presiding
+| [- $panelist]
+| ***** $paperTitle
+| - $author
+| ****** abstract
+| $abstract
+| *** $discussant
+#+END_EXAMPLE
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var markers=markers
   def begin_day():
       pass
 
   def in_day(cur):
-      cur_day = rstring(cur)
-      print markers['day'][0], cur_day
+      global cur_day
+      if cur_day != rstring(cur):
+          cur_day = rstring(cur)
+          print markers['day'][0], cur_day
 
   def end_day():
       pass
@@ -96,8 +116,10 @@ but, alternative doc would have "Source" at second level.
       pass
 
   def in_time(cur):
-      cur_time = rstring(cur)
-      print markers['time'][0], cur_time
+      global cur_time
+      if cur_time != rstring(cur):
+          cur_time = rstring(cur)
+          print markers['time'][0], cur_time
 
   def end_time():
       pass
@@ -207,9 +229,12 @@ but, alternative doc would have "Source" at second level.
 
   lastsection = ""
   sections = listtodict(sections)
-  sections[''] = ['', 'n']        # XXX
+  sections[''] = ['']
   markers = listtodict(markers)
   markers[''] = ''                # XXX
+
+  cur_day = ""
+  cur_time = ""
 #+END_SRC
 
 #+RESULTS:
