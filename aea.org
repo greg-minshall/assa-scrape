@@ -132,6 +132,11 @@ but, alternative doc would have "Source" at second level.
               print "- JEL:", firstchild(session['sessionTitle']).string.strip()
       else:
           print "%s <unnamed session>" % markers['session'][0]
+      print "-", session['sessionSource'].string.strip()
+      if 'sessionType' in session:
+          print "-", session['sessionType'].string.strip()
+      print "-", session['sessionLocation'].string.strip()
+      print "-", "%s %s" % nameaffil(session['presiding'])
 
 
   # paper.format =
