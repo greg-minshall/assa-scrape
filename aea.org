@@ -118,17 +118,21 @@ but, alternative doc would have "Source" at second level.
   # [- $panelist]*\n"
 
   def begin_session():
-      global session
+      global session, papers
       session = {}
+      papers = []                 # new session, new set of papers
 
   def in_session(cur):
       session[rclass(cur)] = cur
 
   def end_session():
       if 'sessionTitle' in session:
-          print "%s %s" % (sections['sessionTitle'][1], session['sessionTitle'])
+          print "%s %s" % (sections['sessionTitle'][1], session['sessionTitle'].contents[0].strip())
+          if firstchild(session['sessionTitle']) :
+              print "- JEL:", firstchild(session['sessionTitle']).string.strip()
       else:
           print "%s <unnamed session>" % markers['session'][0]
+
 
   # paper.format =
   # "***** $paperTitle
@@ -137,17 +141,22 @@ but, alternative doc would have "Source" at second level.
   # $abstract
 
   def begin_paper():
-      global paper
-      paper = {}
+      pass
 
   def in_paper(cur):
-      cl = rclass(cur)
-      paper[cl] = cur
-      if cl == 'paperTitle':
-          print markers['paper'][0], cur.contents[0].string.strip()
+      global papers
+      papers += [cur]
 
   def end_paper():
-      pass
+      for paper in papers:
+          title = paper.find(class_="paperTitle").string.strip()
+          author = paper.find(class_="author")
+          abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
+          print "*****", title
+          print "- %s %s" % nameaffil(author)
+          print "****** abstract:"
+          print abstract
+
 
   def begin_postsession():
       global postsession
