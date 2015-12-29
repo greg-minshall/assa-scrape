@@ -189,8 +189,10 @@ but, alternative doc would have "Source" at second level.
 
   def nameaffils(cur, separator=", "): # XXX descend to get names and affiliations
       result = ""
+      cursep = ""
       for name, affil in zip(cur.findAll(class_="name"), cur.findAll(class_="affiliation")):
-          result = result + separator + name.string.strip() + " " + affil.string.strip()
+          result = result + cursep + name.string.strip() + " " + affil.string.strip()
+          cursep = separator
       return result
 
   # this is the non-semantic part of our process
