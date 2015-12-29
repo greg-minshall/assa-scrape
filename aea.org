@@ -168,7 +168,14 @@ but, alternative doc would have "Source" at second level.
                       if rclass(d) != "discussant":
                           print d, " class: ", rclass(d), type(d), type(d).__name__, navigablestring(d)
                           raise NotImplementedError
-                      print dprefix, "discussant:", nameaffil(d)
+                      print dprefix, "discussant: %s %s" % nameaffil(d)
+
+  # some semantic-aware utility routines
+
+  def nameaffil(cur):             # XXX descend to get name, affiliation
+      name = cur.find(class_="name").string.strip()
+      affil = cur.find(class_="affiliation").string.strip()
+      return (name, affil)
 
   # this is the non-semantic part of our process
 
@@ -197,13 +204,6 @@ but, alternative doc would have "Source" at second level.
       while type(x).__name__ == "NavigableString":
           x = x.next_sibling
       return x
-
-  def nameaffil(cur):             # XXX descend to get name, affiliation
-      kind = cur[u'class']
-      name = cur.find("font", "name")
-      affil = nextsib(name)
-      mass(affil, u'affiliation')
-      (name, affil)
 
   def firstchild(cur):
       try:
@@ -238,7 +238,6 @@ but, alternative doc would have "Source" at second level.
               eval("begin_%s()" % section)       # start the new section
           eval("in_%s(me)" % section)
           # print "%s%s:  %s" % (level, class_, rstring(me))
-          # walk(firstchild(me), level+" ")    # go down
           me = nextsib(me)        # continue this level
 
 
@@ -253,7 +252,6 @@ but, alternative doc would have "Source" at second level.
 #+END_SRC
 
 #+RESULTS:
-: 4
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
