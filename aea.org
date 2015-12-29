@@ -136,7 +136,7 @@ but, alternative doc would have "Source" at second level.
       if 'sessionType' in session:
           print "-", session['sessionType'].string.strip()
       print "-", session['sessionLocation'].string.strip()
-      print "-", "%s %s" % nameaffil(session['presiding'])
+      print "-", nameaffils(session['presiding'])
 
 
   # paper.format =
@@ -157,7 +157,7 @@ but, alternative doc would have "Source" at second level.
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
           print "*****", title
-          print "- %s %s" % nameaffil(author)
+          print "- %s" % nameaffils(author)
           print "****** abstract:"
           if paper.find(class_="hyperlink"):
               abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
@@ -183,7 +183,7 @@ but, alternative doc would have "Source" at second level.
                       if rclass(d) != "discussant":
                           print d, " class: ", rclass(d), type(d), type(d).__name__, navigablestring(d)
                           raise NotImplementedError
-                      print dprefix, "discussant: %s %s" % nameaffil(d)
+                      print dprefix, "discussant: %s" % nameaffils(d)
 
   # some semantic-aware utility routines
 
