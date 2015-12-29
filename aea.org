@@ -187,10 +187,11 @@ but, alternative doc would have "Source" at second level.
 
   # some semantic-aware utility routines
 
-  def nameaffil(cur):             # XXX descend to get name, affiliation
-      name = cur.find(class_="name").string.strip()
-      affil = cur.find(class_="affiliation").string.strip()
-      return (name, affil)
+  def nameaffils(cur, separator=", "): # XXX descend to get names and affiliations
+      result = ""
+      for name, affil in zip(cur.findAll(class_="name"), cur.findAll(class_="affiliation")):
+          result = result + separator + name.string.strip() + " " + affil.string.strip()
+      return result
 
   # this is the non-semantic part of our process
 
@@ -267,12 +268,7 @@ but, alternative doc would have "Source" at second level.
 #+END_SRC
 
 #+RESULTS:
-: <div class="paper"><font class="paperTitle">Family Planning and Fertility in South Africa under Apartheid</font>
-: <div class="author">
-: <font class="name">Johannes Norling					</font>
-: <font class="affiliation">(University of Michigan)</font>
-: </div> <div id="paper_10230_abstract" style="font-size:12px; display:none;">tbd</div>
-: </div>
+: , Jan Kregel (Levy Economics Institute of Bard College)
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
