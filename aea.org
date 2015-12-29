@@ -156,11 +156,12 @@ but, alternative doc would have "Source" at second level.
       for paper in papers:
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
-          abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
           print "*****", title
           print "- %s %s" % nameaffil(author)
           print "****** abstract:"
-          print abstract
+          if paper.find(class_="hyperlink"):
+              abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
+              print abstract
 
 
   def begin_postsession():
@@ -266,6 +267,12 @@ but, alternative doc would have "Source" at second level.
 #+END_SRC
 
 #+RESULTS:
+: <div class="paper"><font class="paperTitle">Family Planning and Fertility in South Africa under Apartheid</font>
+: <div class="author">
+: <font class="name">Johannes Norling					</font>
+: <font class="affiliation">(University of Michigan)</font>
+: </div> <div id="paper_10230_abstract" style="font-size:12px; display:none;">tbd</div>
+: </div>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
