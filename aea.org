@@ -84,6 +84,14 @@ but, alternative doc would have "Source" at second level.
 *** $discussant
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var markers=markers
+  def semantic_init():
+      global cur_day, cur_time, session, papers, postsession
+      cur_day = ""
+      cur_time = ""
+      session = {}
+      papers = []
+      postsession = []
+
   def begin_day():
       pass
 
@@ -241,6 +249,8 @@ but, alternative doc would have "Source" at second level.
 
   def walk(me, level=""):
       global lastsection, section, lastme
+      lastsection = ""
+      semantic_init()
       while me:
           lastme = me
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
@@ -259,18 +269,15 @@ but, alternative doc would have "Source" at second level.
           me = nextsib(me)        # continue this level
 
 
-  lastsection = ""
   sections = listtodict(sections)
   sections[''] = ['']
   markers = listtodict(markers)
   markers[''] = ''                # XXX
 
-  cur_day = ""
-  cur_time = ""
+  # walk(soup.find(class_="dayHeader"))
 #+END_SRC
 
 #+RESULTS:
-: , Jan Kregel (Levy Economics Institute of Bard College)
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
