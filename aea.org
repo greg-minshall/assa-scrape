@@ -50,26 +50,26 @@ same, don't emit anything; else, emit a new "** Session time: %"
 but, alternative doc would have "Source" at second level.
 
 #+name: sections
-| tag                | section     | marker           |
-|--------------------+-------------+------------------|
-| dayHeader          | day         | **               |
-| sessionTime        | time        | ***              |
-| sessionTitle       | session     | ****             |
-| topic              | session     | *****            |
-| sessionJEL         | session     | - JEL:           |
-| sessionSource      | session     | -                |
-| sessionType        | session     |                  |
-| sessionLocation    | session     | -                |
-| presiding          | session     | -                |
-| panelist           | session     | -                |
-| paper              | paper       |                  |
-| paperTitle         | paper       | *****            |
-| author             | paper       | - author(s):     |
-| hyperlink          | paper       | ****** abstract: |
-| nameaffil          |             | -                |
-| affiliation        |             |                  |
-| discussantsSection | postsession | *****            |
-| discussant         | postsession |                  |
+| tag                | section     | premarker        | postmarker |
+|--------------------+-------------+------------------+------------|
+| dayHeader          | day         | **               |            |
+| sessionTime        | time        | ***              |            |
+| sessionTitle       | session     | ****             |            |
+| topic              | session     | *****            |            |
+| sessionJEL         | session     | - JEL:           |            |
+| sessionSource      | session     | -                |            |
+| sessionType        | session     |                  |            |
+| sessionLocation    | session     | -                |            |
+| presiding          | session     | -                |            |
+| panelist           | session     | -                |            |
+| paper              | paper       |                  |            |
+| paperTitle         | paper       | *****            |            |
+| author             | paper       | - author(s):     |            |
+| hyperlink          | paper       | ****** abstract: |            |
+| nameaffil          |             | -                |            |
+| affiliation        |             |                  |            |
+| discussantsSection | postsession | *****            |            |
+| discussant         | postsession |                  |            |
 
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections
@@ -90,7 +90,7 @@ but, alternative doc would have "Source" at second level.
       global cur_day
       if cur_day != rstring(cur):
           cur_day = rstring(cur)
-          print marker('dayHeader'), cur_day
+          print premarker('dayHeader'), cur_day, postmarker('dayHeader')
 
   def end_day():
       pass
@@ -102,7 +102,7 @@ but, alternative doc would have "Source" at second level.
       global cur_time
       if cur_time != rstring(cur):
           cur_time = rstring(cur)
-          print marker('sessionTime'), cur_time
+          print premarker('sessionTime'), cur_time, postmarker('sessionTime')
 
   def end_time():
       pass
@@ -126,20 +126,25 @@ but, alternative doc would have "Source" at second level.
 
   def end_session():
       if 'sessionTitle' in session:
-          print marker('sessionTitle'), session['sessionTitle'].contents[0].strip()
+          print premarker('sessionTitle'), session['sessionTitle'].contents[0].strip(), postmarker('sessionTitle')
           if firstchild(session['sessionTitle']) :
-              print marker('sessionJEL'), firstchild(session['sessionTitle']).string.strip()
+              print premarker('sessionJEL'), firstchild(session['sessionTitle']).string.strip(), postmarker('sessionJEL')
       else:
-          print marker('sessionTitle'), "<unnamed session>"
-      print marker("sessionSource"), session['sessionSource'].string.strip()
+          print premarker('sessionTitle'), "<unnamed session>", postmarker('sessionTitle')
+      print premarker("sessionSource"), session['sessionSource'].string.strip(), postmarker('sessionSource')
       if 'sessionType' in session:
-          print marker('sessionType'], session['sessionType'].string.strip()
-      print marker('sessionLocation'), re.sub("^,", "", session['sessionLocation'].string.strip()
-      print marker('nameaffil'), nameaffils(session['presiding'])
+          print premarker('sessionType'], session['sessionType'].string.strip(), postmarker('sessionType')
+      print premarker('sessionLocation'), re.sub("^,", "", session['sessionLocation'].string.strip()), postmarker('sessionLocation')
+      print premarker('nameaffil'), nameaffils(session['presiding']), postmarker('nameaffil')
 
-  def marker(sect):
+  def premarker(sect):
       return sections[sect][1]
 
+  def postmarker(sect):
+      return sections[sect][2]
+
+  def withmarkers(sect, str):
+      print premarker(sect), str, postmarker(sect)
 
   # paper.format =
   # "***** $paperTitle
@@ -158,9 +163,9 @@ but, alternative doc would have "Source" at second level.
       for paper in papers:
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
-          print marker('paperTitle'), title
-          print marker('nameaffil'), nameaffils(author)
-          print marker('hyperlink')
+          print premarker('paperTitle'), title
+          print premarker('nameaffil'), nameaffils(author)
+          print premarker('hyperlink')
           if paper.find(class_="hyperlink"):
               abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
               print abstract
@@ -183,7 +188,7 @@ but, alternative doc would have "Source" at second level.
                       if rclass(d) != "discussant":
                           print d, " class: ", rclass(d), type(d), type(d).__name__, navigablestring(d)
                           raise NotImplementedError
-                      print marker('discussantsSection'), "discussant: %s" % nameaffils(d)
+                      print premarker('discussantsSection'), "discussant: %s" % nameaffils(d)
 
   # some semantic-aware utility routines
 
