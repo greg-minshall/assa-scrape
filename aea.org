@@ -49,7 +49,7 @@ same, don't emit anything; else, emit a new "** Session time: %"
 
 but, alternative doc would have "Source" at second level.
 
-#+name: sections
+#+name: orgsections
 | tag                | section     | premarker        | postmarker |
 |--------------------+-------------+------------------+------------|
 | dayHeader          | day         | **               |            |
@@ -71,8 +71,32 @@ but, alternative doc would have "Source" at second level.
 | discussantsSection | postsession | *****            |            |
 | discussant         | postsession |                  |            |
 
+problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
-#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var outfile="aea-sched.html"
+#+name: htmlsections
+| tag                | section     | premarker        | postmarker |
+|--------------------+-------------+------------------+------------|
+| dayHeader          | day         | <li>             | </li>      |
+| sessionTime        | time        | <li>             |            |
+| sessionTitle       | session     | ****             |            |
+| topic              | session     | *****            |            |
+| sessionJEL         | session     | - JEL:           |            |
+| sessionSource      | session     | -                |            |
+| sessionType        | session     |                  |            |
+| sessionLocation    | session     | -                |            |
+| presiding          | session     | -                |            |
+| panelist           | session     | -                |            |
+| paper              | paper       |                  |            |
+| paperTitle         | paper       | *****            |            |
+| author             | paper       | - author(s):     |            |
+| hyperlink          | paper       | ****** abstract: |            |
+| nameaffil          |             | -                |            |
+| affiliation        |             |                  |            |
+| discussantsSection | postsession | *****            |            |
+| discussant         | postsession |                  |            |
+
+
+#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=orgsections :var outfile="aea-sched.html"
   import re
 
   def semantic_init():
@@ -135,7 +159,8 @@ but, alternative doc would have "Source" at second level.
       if 'sessionType' in session:
           withmarkers('sessionType', session['sessionType'].string.strip())
       withmarkers('sessionLocation', re.sub("^,", "", session['sessionLocation'].string.strip()))
-      withmarkers('nameaffil', nameaffils(session['presiding']))
+      if 'presiding' in session:
+          withmarkers('nameaffil', nameaffils(session['presiding']))
 
 
   # paper.format =
@@ -265,20 +290,25 @@ but, alternative doc would have "Source" at second level.
       while me:
           lastme = me
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
-          # print "%s%s:  %s" % (level, rclass(me), rstring(me))
           class_ = rclass(me)
-          section = sections[class_][0]
-          if section == "":
-              section = lastsection
-          if section != lastsection: # changing section
-              if lastsection != "":
-                  eval("end_%s()" % lastsection) # end the previous section
-              lastsection = section
-              eval("begin_%s()" % section)       # start the new section
-          eval("in_%s(me)" % section)
-          # print "%s%s:  %s" % (level, class_, rstring(me))
-          me = nextsib(me)        # continue this level
+          if class_ != '':
+              section = sections[class_][0]
+              if section == "":
+                  section = lastsection
+              if section != lastsection: # changing section
+                  if lastsection != "":
+                      eval("end_%s()" % lastsection) # end the previous section
+                  lastsection = section
+                  eval("begin_%s()" % section)       # start the new section
+              eval("in_%s(me)" % section)
+              # print "%s%s:  %s" % (level, class_, rstring(me))
+              me = nextsib(me)        # continue this level
 
+  def walkdown(parents):
+      first = True
+      for one in parents:
+          walk(firstchild(one), reset=first)
+          first = False
 
   sections = listtodict(sections)
   sections[''] = ['']
@@ -345,3 +375,25 @@ pprint(players)
 
 #+RESULTS:
 : None
+
+#+BEGIN_SRC python :session py
+  # https://bytes.com/topic/python/answers/684389-removing-certain-tags-html-files
+  from BeautifulSoup import BeautifulSoup
+  def remove(soup, tagname):
+      for tag in soup.findAll(tagname):
+          contents = tag.contents
+          parent = tag.parent
+          tag.extract()
+          for tag in contents:
+              parent.append(tag)
+
+  def main():
+      source = '<a><b>This is a <c>Test</c></b></a>'
+      soup = BeautifulSoup(source)
+      print soup
+      remove(soup, 'b')
+      print soup
+#+END_SRC
+
+#+RESULTS:
+
