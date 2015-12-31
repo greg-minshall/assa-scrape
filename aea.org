@@ -72,7 +72,7 @@ but, alternative doc would have "Source" at second level.
 | discussant         | postsession |                  |            |
 
 
-#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections
+#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=sections :var outfile="aea-sched.html"
   import re
 
   def semantic_init():
@@ -90,7 +90,7 @@ but, alternative doc would have "Source" at second level.
       global cur_day
       if cur_day != rstring(cur):
           cur_day = rstring(cur)
-          print premarker('dayHeader'), cur_day, postmarker('dayHeader')
+          withmarkers('dayHeader', cur_day)
 
   def end_day():
       pass
@@ -102,7 +102,7 @@ but, alternative doc would have "Source" at second level.
       global cur_time
       if cur_time != rstring(cur):
           cur_time = rstring(cur)
-          print premarker('sessionTime'), cur_time, postmarker('sessionTime')
+          withmarkers('sessionTime', cur_time)
 
   def end_time():
       pass
@@ -126,25 +126,17 @@ but, alternative doc would have "Source" at second level.
 
   def end_session():
       if 'sessionTitle' in session:
-          print premarker('sessionTitle'), session['sessionTitle'].contents[0].strip(), postmarker('sessionTitle')
+          withmarkers('sessionTitle', session['sessionTitle'].contents[0].strip())
           if firstchild(session['sessionTitle']) :
-              print premarker('sessionJEL'), firstchild(session['sessionTitle']).string.strip(), postmarker('sessionJEL')
+              withmarkers('sessionJEL', firstchild(session['sessionTitle']).string.strip())
       else:
-          print premarker('sessionTitle'), "<unnamed session>", postmarker('sessionTitle')
-      print premarker("sessionSource"), session['sessionSource'].string.strip(), postmarker('sessionSource')
+          withmarkers('sessionTitle', "<unnamed session>")
+      withmarkers('sessionSource', session['sessionSource'].string.strip())
       if 'sessionType' in session:
-          print premarker('sessionType'], session['sessionType'].string.strip(), postmarker('sessionType')
-      print premarker('sessionLocation'), re.sub("^,", "", session['sessionLocation'].string.strip()), postmarker('sessionLocation')
-      print premarker('nameaffil'), nameaffils(session['presiding']), postmarker('nameaffil')
+          withmarkers('sessionType', session['sessionType'].string.strip())
+      withmarkers('sessionLocation', re.sub("^,", "", session['sessionLocation'].string.strip()))
+      withmarkers('nameaffil', nameaffils(session['presiding']))
 
-  def premarker(sect):
-      return sections[sect][1]
-
-  def postmarker(sect):
-      return sections[sect][2]
-
-  def withmarkers(sect, str):
-      print premarker(sect), str, postmarker(sect)
 
   # paper.format =
   # "***** $paperTitle
@@ -163,12 +155,13 @@ but, alternative doc would have "Source" at second level.
       for paper in papers:
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
-          print premarker('paperTitle'), title
-          print premarker('nameaffil'), nameaffils(author)
-          print premarker('hyperlink')
+          withmarkers('paperTitle', title)
+          withmarkers('nameaffil', nameaffils(author))
           if paper.find(class_="hyperlink"):
+              output(premarker('hyperlink'))
               abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
-              print abstract
+              output(abstract)
+              output(postmarker('hyperlink'))
 
 
   def begin_postsession():
@@ -186,9 +179,11 @@ but, alternative doc would have "Source" at second level.
               for d in dsection.children:      # discussant
                   if not navigablestring(d):
                       if rclass(d) != "discussant":
-                          print d, " class: ", rclass(d), type(d), type(d).__name__, navigablestring(d)
+                          output("%s class: %s %s %s %s" %
+                                 (d, rclass(d), type(d),
+                                  type(d).__name__, navigablestring(d)))
                           raise NotImplementedError
-                      print premarker('discussantsSection'), "discussant: %s" % nameaffils(d)
+                      withmarkers('discussantsSection', "discussant: %s" % nameaffils(d))
 
   # some semantic-aware utility routines
 
@@ -200,7 +195,23 @@ but, alternative doc would have "Source" at second level.
           cursep = separator
       return result
 
+
+  def premarker(sect):
+      return sections[sect][1]
+
+  def postmarker(sect):
+      return sections[sect][2]
+
+  def withmarkers(sect, str):
+      output("%s %s %s" % (premarker(sect), str, postmarker(sect)))
+
+
   # this is the non-semantic part of our process
+
+  def output(str):
+      global outf
+      outf.write(str.encode("utf-8"))
+      outf.write(u"\n".encode("utf-8"))
 
   def navigablestring(cur):
       return type(cur).__name__ == "NavigableString"
@@ -245,10 +256,12 @@ but, alternative doc would have "Source" at second level.
       return a
 
   def walk(me, level="", reset=True):
-      global lastsection, section, lastme
+      global lastsection, section, lastme, outfile, outf
       if reset:
           lastsection = ""
           semantic_init()
+          outf = open(outfile, "w")
+          # https://docs.python.org/2/howto/unicode.html
       while me:
           lastme = me
           # print "%s%s:  %s" % (level, rclass(me), rstring(me))
