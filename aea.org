@@ -240,23 +240,21 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
   # paradoxically, we call begin at end, end at begin...
   def end_parent(tag):
-      if queryentered(tag) > 0:
+      global parents
+      if tag in parents:
+          tail = parents.pop()
+          while tail != tag:      # grab
+              output(sections[tail][s_afterchild])
+              tail = parents.pop()
           output(sections[tag][s_afterchild])
 
   def begin_parent(tag):
+      global parents
       output(sections[tag][s_beforechild])
-      increntered(tag)
+      parents.append(tag)
 
 
   # this is the non-semantic part of our process
-
-  def increntered(class_):
-      global sections
-      sections[class_][slen] += 1
-
-  def queryentered(class_):
-      global sections, slen
-      return sections[class_][slen]
 
   def output(str):
       global outf
@@ -346,12 +344,12 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
   s_postmarker = 2
   s_beforechild = 3
   s_afterchild = 4
-  s_entered = 5
-
-  for i in sections:
-      sections[i].extend([0])
 
   sections[''] = ['']
+
+  # http://stackoverflow.com/a/4688885
+  # https://docs.python.org/2/tutorial/datastructures.html
+  parents = []
 
   # walk(soup.find(class_="dayHeader")) # *old* style
   # walkdown(soup.findAll(id=re.compile("group_div.*")))
