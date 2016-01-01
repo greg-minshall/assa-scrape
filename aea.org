@@ -50,53 +50,53 @@ same, don't emit anything; else, emit a new "** Session time: %"
 but, alternative doc would have "Source" at second level.
 
 #+name: orgsections
-| tag                | section     | premarker        | postmarker |
-|--------------------+-------------+------------------+------------|
-| dayHeader          | day         | **               |            |
-| sessionTime        | time        | ***              |            |
-| sessionTitle       | session     | ****             |            |
-| topic              | session     | *****            |            |
-| sessionJEL         | session     | - JEL:           |            |
-| sessionSource      | session     | -                |            |
-| sessionType        | session     |                  |            |
-| sessionLocation    | session     | -                |            |
-| presiding          | session     | -                |            |
-| panelist           | session     | -                |            |
-| paper              | paper       |                  |            |
-| paperTitle         | paper       | *****            |            |
-| author             | paper       | - author(s):     |            |
-| hyperlink          | paper       | ****** abstract: |            |
-| nameaffil          |             | -                |            |
-| affiliation        |             |                  |            |
-| discussantsSection | postsession | *****            |            |
-| discussant         | postsession |                  |            |
+| tag                | section     | premarker        | postmarker | beforechild | afterchild |
+|--------------------+-------------+------------------+------------+-------------+------------|
+| dayHeader          | day         | **               |            |             |            |
+| sessionTime        | time        | ***              |            |             |            |
+| sessionTitle       | session     | ****             |            |             |            |
+| topic              | session     | *****            |            |             |            |
+| sessionJEL         | session     | - JEL:           |            |             |            |
+| sessionSource      | session     | -                |            |             |            |
+| sessionType        | session     |                  |            |             |            |
+| sessionLocation    | session     | -                |            |             |            |
+| presiding          | session     | -                |            |             |            |
+| panelist           | session     | -                |            |             |            |
+| paper              | paper       |                  |            |             |            |
+| paperTitle         | paper       | *****            |            |             |            |
+| author             | paper       | - author(s):     |            |             |            |
+| hyperlink          | paper       | ****** abstract: |            |             |            |
+| nameaffil          |             | -                |            |             |            |
+| affiliation        |             |                  |            |             |            |
+| discussantsSection | postsession | *****            |            |             |            |
+| discussant         | postsession |                  |            |             |            |
 
 problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
 #+name: htmlsections
-| tag                | section     | premarker        | postmarker |
-|--------------------+-------------+------------------+------------|
-| dayHeader          | day         | <li>             | </li>      |
-| sessionTime        | time        | <li>             |            |
-| sessionTitle       | session     | ****             |            |
-| topic              | session     | *****            |            |
-| sessionJEL         | session     | - JEL:           |            |
-| sessionSource      | session     | -                |            |
-| sessionType        | session     |                  |            |
-| sessionLocation    | session     | -                |            |
-| presiding          | session     | -                |            |
-| panelist           | session     | -                |            |
-| paper              | paper       |                  |            |
-| paperTitle         | paper       | *****            |            |
-| author             | paper       | - author(s):     |            |
-| hyperlink          | paper       | ****** abstract: |            |
-| nameaffil          |             | -                |            |
-| affiliation        |             |                  |            |
-| discussantsSection | postsession | *****            |            |
-| discussant         | postsession |                  |            |
+| tag                | section     | premarker       | postmarker | beforechild | afterchild |
+|--------------------+-------------+-----------------+------------+-------------+------------|
+| dayHeader          | day         | <li>            | </li>      | <ul>        | </ul>      |
+| sessionTime        | time        | <li>            |            | <ul>        | </ul>      |
+| sessionTitle       | session     | <li>            | </li>      | <ul>        | </ul>      |
+| topic              | session     | <li>            | </li>      | <ul>        | </ul>      |
+| sessionJEL         | session     | <li> JEL:       | </li>      |             |            |
+| sessionSource      | session     | <li>            | </li>      |             |            |
+| sessionType        | session     | <li>            | </li>      |             |            |
+| sessionLocation    | session     | <li>            | </li>      |             |            |
+| presiding          | session     | <li>            | </li>      |             |            |
+| panelist           | session     | <li>            | </li>      |             |            |
+| paper              | paper       |                 |            |             |            |
+| paperTitle         | paper       | <li>            | </li>      | <ul>        | </ul>      |
+| author             | paper       | <li> author(s): | </li>      |             |            |
+| hyperlink          | paper       | <li> abstract:  | </li>      | <ul>        | </ul>      |
+| nameaffil          |             | <li>            | </li>      |             |            |
+| affiliation        |             | <li>            | </li>      |             |            |
+| discussantsSection | postsession | <li>            | </li>      | <ul>        | </ul>      |
+| discussant         | postsession |                 |            |             |            |
 
 
-#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=orgsections :var outfile="aea-sched.html"
+#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=htmlsections :var outfile="aea-sched.html"
   import re
 
   def semantic_init():
@@ -108,7 +108,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       postsession = []
 
   def begin_day():
-      pass
+      end_parent('dayHeader')
 
   def in_day(cur):
       global cur_day
@@ -117,10 +117,11 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('dayHeader', cur_day)
 
   def end_day():
-      pass
+      begin_parent('dayHeader')
 
   def begin_time():
-      pass
+      global cur_time
+      end_parent('sessionTime')
 
   def in_time(cur):
       global cur_time
@@ -129,7 +130,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('sessionTime', cur_time)
 
   def end_time():
-      pass
+      begin_parent('sessionTime')
 
   # session.format = 
   # "**** $sessionTitle
@@ -144,11 +145,13 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       global session, papers
       session = {}
       papers = []                 # new session, new set of papers
+      end_parent('sessionTitle')
 
   def in_session(cur):
       session[rclass(cur)] = cur
 
   def end_session():
+      begin_parent('sessionTitle')
       if 'sessionTitle' in session:
           withmarkers('sessionTitle', session['sessionTitle'].contents[0].strip())
           if firstchild(session['sessionTitle']) :
@@ -170,13 +173,14 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
   # $abstract
 
   def begin_paper():
-      pass
+      end_parent('paperTitle')
 
   def in_paper(cur):
       global papers
       papers += [cur]
 
   def end_paper():
+      begin_parent('paperTitle')
       for paper in papers:
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
@@ -184,13 +188,16 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('nameaffil', nameaffils(author))
           if paper.find(class_="hyperlink"):
               output(premarker('hyperlink'))
+              begin_parent('hyperlink')
               abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
               output(abstract)
               output(postmarker('hyperlink'))
+              end_parent('hyperlink')
 
 
   def begin_postsession():
       global postsession
+      end_parent('discussantsSection')
       postsession = []
 
   def in_postsession(cur):
@@ -199,6 +206,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
   def end_postsession():
       if "postsession" in globals():
+          end_parent('discussantsSection')
           global postsession
           for dsection in postsession:
               for d in dsection.children:      # discussant
@@ -222,16 +230,33 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
 
   def premarker(sect):
-      return sections[sect][1]
+      return sections[sect][s_premarker]
 
   def postmarker(sect):
-      return sections[sect][2]
+      return sections[sect][s_postmarker]
 
   def withmarkers(sect, str):
       output("%s %s %s" % (premarker(sect), str, postmarker(sect)))
 
+  # paradoxically, we call begin at end, end at begin...
+  def end_parent(tag):
+      if queryentered(tag) > 0:
+          output(sections[tag][s_afterchild])
+
+  def begin_parent(tag):
+      output(sections[tag][s_beforechild])
+      increntered(tag)
+
 
   # this is the non-semantic part of our process
+
+  def increntered(class_):
+      global sections
+      sections[class_][slen] += 1
+
+  def queryentered(class_):
+      global sections, slen
+      return sections[class_][slen]
 
   def output(str):
       global outf
@@ -280,7 +305,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           a[i[0]] = i[1:]
       return a
 
-  def walk(me, level="", reset=True):
+  def walk(me, reset=True):
       global lastsection, section, lastme, outfile, outf
       if reset:
           lastsection = ""
@@ -289,10 +314,10 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           # https://docs.python.org/2/howto/unicode.html
       while me:
           lastme = me
-          # print "%s%s:  %s" % (level, rclass(me), rstring(me))
+          # print "%s:  %s" % (rclass(me), rstring(me))
           class_ = rclass(me)
           if class_ != '':
-              section = sections[class_][0]
+              section = sections[class_][s_section]
               if section == "":
                   section = lastsection
               if section != lastsection: # changing section
@@ -301,7 +326,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
                   lastsection = section
                   eval("begin_%s()" % section)       # start the new section
               eval("in_%s(me)" % section)
-              # print "%s%s:  %s" % (level, class_, rstring(me))
+              # print "%s:  %s" % (class_, rstring(me))
               me = nextsib(me)        # continue this level
 
   def walkdown(parents):
@@ -311,9 +336,25 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           first = False
 
   sections = listtodict(sections)
+
+  for i in sections:
+      slen = len(sections[i])
+      break
+
+  s_section = 0
+  s_premarker = 1
+  s_postmarker = 2
+  s_beforechild = 3
+  s_afterchild = 4
+  s_entered = 5
+
+  for i in sections:
+      sections[i].extend([0])
+
   sections[''] = ['']
 
-  # walk(soup.find(class_="dayHeader"))
+  # walk(soup.find(class_="dayHeader")) # *old* style
+  # walkdown(soup.findAll(id=re.compile("group_div.*")))
 #+END_SRC
 
 #+RESULTS:
