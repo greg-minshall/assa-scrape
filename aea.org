@@ -74,26 +74,26 @@ but, alternative doc would have "Source" at second level.
 problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
 #+name: htmlsections
-| tag                | section     | premarker       | postmarker | beforechild | afterchild |
-|--------------------+-------------+-----------------+------------+-------------+------------|
-| dayHeader          | day         | <li>            | </li>      | <ul>        | </ul>      |
-| sessionTime        | time        | <li>            |            | <ul>        | </ul>      |
-| sessionTitle       | session     | <li>            | </li>      | <ul>        | </ul>      |
-| topic              | session     | <li>            | </li>      | <ul>        | </ul>      |
-| sessionJEL         | session     | <li> JEL:       | </li>      |             |            |
-| sessionSource      | session     | <li>            | </li>      |             |            |
-| sessionType        | session     | <li>            | </li>      |             |            |
-| sessionLocation    | session     | <li>            | </li>      |             |            |
-| presiding          | session     | <li>            | </li>      |             |            |
-| panelist           | session     | <li>            | </li>      |             |            |
-| paper              | paper       |                 |            |             |            |
-| paperTitle         | paper       | <li>            | </li>      | <ul>        | </ul>      |
-| author             | paper       | <li> author(s): | </li>      |             |            |
-| hyperlink          | paper       | <li> abstract:  | </li>      | <ul>        | </ul>      |
-| nameaffil          |             | <li>            | </li>      |             |            |
-| affiliation        |             | <li>            | </li>      |             |            |
-| discussantsSection | postsession | <li>            | </li>      | <ul>        | </ul>      |
-| discussant         | postsession |                 |            |             |            |
+| tag                | section     | premarker       | postmarker | beforechild                  | afterchild |
+|--------------------+-------------+-----------------+------------+------------------------------+------------|
+| dayHeader          | day         | <li>            | </li>      | <ul class="collapsibleList"> | </ul>      |
+| sessionTime        | time        | <li>            |            | <ul class="collapsibleList"> | </ul>      |
+| sessionTitle       | session     | <li>            | </li>      | <ul class="collapsibleList"> | </ul>      |
+| topic              | session     | <li>            | </li>      | <ul class="collapsibleList"> | </ul>      |
+| sessionJEL         | session     | <li> JEL:       | </li>      |                              |            |
+| sessionSource      | session     | <li>            | </li>      |                              |            |
+| sessionType        | session     | <li>            | </li>      |                              |            |
+| sessionLocation    | session     | <li>            | </li>      |                              |            |
+| presiding          | session     | <li>            | </li>      |                              |            |
+| panelist           | session     | <li>            | </li>      |                              |            |
+| paper              | paper       |                 |            |                              |            |
+| paperTitle         | paper       | <li>            | </li>      | <ul class="collapsibleList"> | </ul>      |
+| author             | paper       | <li> author(s): | </li>      |                              |            |
+| hyperlink          | paper       | <li> abstract:  | </li>      | <ul class="collapsibleList"> | </ul>      |
+| nameaffil          |             | <li>            | </li>      |                              |            |
+| affiliation        |             | <li>            | </li>      |                              |            |
+| discussantsSection | postsession | <li>            | </li>      | <ul class="collapsibleList"> | </ul>      |
+| discussant         | postsession |                 |            |                              |            |
 
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=htmlsections :var outfile="aea-sched.html"
@@ -436,3 +436,4 @@ pprint(players)
 
 #+RESULTS:
 
+[[http://bradclicks.com/CSSplay/foldingList.html][css collapsible lists]]
