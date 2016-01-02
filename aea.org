@@ -79,7 +79,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 | dayHeader          | day         | <li><input type="checkbox" id="dayHeader%{d}"><label for="dayHeader%{d}">       | </label>   | <ul>        | </ul></li> |
 | sessionTime        | time        | <li><input type="checkbox" id="sessionTime%{d}"><label for="sessionTime%{d}">   | </label>   | <ul>        | </ul></li> |
 | sessionTitle       | session     | <li><input type="checkbox" id="sessionTitle%{d}"><label for="sessionTitle%{d}"> | </label>   | <ul>        | </ul></li> |
-| topic              | session     | <li>                                                                            | </li>      | <ul>        | </ul>      |
+| topic              | session     | <li>                                                                            | </li>      |             |            |
 | sessionJEL         | session     | <li> JEL:                                                                       | </li>      |             |            |
 | sessionSource      | session     | <li>                                                                            | </li>      |             |            |
 | sessionType        | session     | <li>                                                                            | </li>      |             |            |
@@ -151,13 +151,13 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       session[rclass(cur)] = cur
 
   def end_session():
-      begin_parent('sessionTitle')
       if 'sessionTitle' in session:
           withmarkers('sessionTitle', session['sessionTitle'].contents[0].strip())
-          if firstchild(session['sessionTitle']) :
-              withmarkers('sessionJEL', firstchild(session['sessionTitle']).string.strip())
       else:
           withmarkers('sessionTitle', "<unnamed session>")
+      begin_parent('sessionTitle')
+      if firstchild(session['sessionTitle']) :
+          withmarkers('sessionJEL', firstchild(session['sessionTitle']).string.strip())
       withmarkers('sessionSource', session['sessionSource'].string.strip())
       if 'sessionType' in session:
           withmarkers('sessionType', session['sessionType'].string.strip())
