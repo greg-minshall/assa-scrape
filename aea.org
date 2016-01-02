@@ -120,17 +120,18 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       begin_parent('dayHeader')
 
   def begin_time():
-      global cur_time
-      end_parent('sessionTime')
+      pass
 
   def in_time(cur):
       global cur_time
       if cur_time != rstring(cur):
           cur_time = rstring(cur)
+          end_parent('sessionTime')
           withmarkers('sessionTime', cur_time)
+          begin_parent('sessionTime')
 
   def end_time():
-      begin_parent('sessionTime')
+      pass
 
   # session.format = 
   # "**** $sessionTitle
