@@ -76,23 +76,23 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+name: htmlsections
 | tag                | section     | premarker                                                                       | postmarker | beforechild      | afterchild      |
 |--------------------+-------------+---------------------------------------------------------------------------------+------------+------------------+-----------------|
-| dayHeader          | day         | <li><input type="checkbox" id="dayHeader%{d}"><label for="dayHeader%{d}">       | </label>   | <ul>             | </ul></li>      |
-| sessionTime        | time        | <li><input type="checkbox" id="sessionTime%{d}"><label for="sessionTime%{d}">   | </label>   | <ul>             | </ul></li>      |
-| sessionTitle       | session     | <li><input type="checkbox" id="sessionTitle%{d}"><label for="sessionTitle%{d}"> | </label>   | <ul>             | </ul></li>      |
-| topic              | session     | <li>                                                                            | </li>      |                  |                 |
-| sessionJEL         | session     | <li> JEL:                                                                       | </li>      |                  |                 |
-| sessionSource      | session     | <li>                                                                            | </li>      |                  |                 |
-| sessionType        | session     | <li>                                                                            | </li>      |                  |                 |
-| sessionLocation    | session     | <li>                                                                            | </li>      |                  |                 |
-| presiding          | session     | <li>                                                                            | </li>      |                  |                 |
-| panelist           | session     | <li>                                                                            | </li>      |                  |                 |
+| dayHeader          | day         | <li><input type="checkbox" id="dayHeader%{d}"><label for="dayHeader%{d}">       | </label>\n | <ul>             | </ul></li>      |
+| sessionTime        | time        | <li><input type="checkbox" id="sessionTime%{d}"><label for="sessionTime%{d}">   | </label>\n | <ul>             | </ul></li>      |
+| sessionTitle       | session     | <li><input type="checkbox" id="sessionTitle%{d}"><label for="sessionTitle%{d}"> | </label>\n | <ul>             | </ul></li>      |
+| topic              | session     | <li>                                                                            | </li>\n    |                  |                 |
+| sessionJEL         | session     | <li> JEL:                                                                       | </li>\n    |                  |                 |
+| sessionSource      | session     | <li>                                                                            | </li>\n    |                  |                 |
+| sessionType        | session     | <li>                                                                            | </li>\n    |                  |                 |
+| sessionLocation    | session     | <li>                                                                            | </li>\n    |                  |                 |
+| presiding          | session     | <li>                                                                            | </li>\n    |                  |                 |
+| panelist           | session     | <li>                                                                            | </li>\n    |                  |                 |
 | paper              | paper       |                                                                                 |            |                  |                 |
-| paperTitle         | paper       | <li><input type="checkbox" id="paper%{d}"><label for="paper%{d}">               | </label>   | <ul>             | </ul></li>      |
-| author             | paper       | <li>                                                                            | </li>      |                  |                 |
-| hyperlink          | paper       | <li><input type="checkbox" id="hyperlink%{d}"><label for="hyperlink%{d}">       | </label>   | abstract<ul><li> | </li></ul></li> |
-| nameaffil          |             | <li>                                                                            | </li>      |                  |                 |
-| affiliation        |             | <li>                                                                            | </li>      |                  |                 |
-| discussantsSection | postsession | <li>                                                                            | </li>      | <ul>             | </ul>           |
+| paperTitle         | paper       | <li><input type="checkbox" id="paper%{d}"><label for="paper%{d}">               | </label>\n | <ul>             | </ul></li>      |
+| author             | paper       | <li>                                                                            | </li>\n    |                  |                 |
+| hyperlink          | paper       | <li><input type="checkbox" id="hyperlink%{d}"><label for="hyperlink%{d}">       | </label>\n | abstract<ul><li> | </li></ul></li> |
+| nameaffil          |             | <li>                                                                            | </li>\n    |                  |                 |
+| affiliation        |             | <li>                                                                            | </li>\n    |                  |                 |
+| discussantsSection | postsession | <li>                                                                            | </li>\n    | <ul>             | </ul>           |
 | discussant         | postsession |                                                                                 |            |                  |                 |
 
 
@@ -182,10 +182,9 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
   def end_paper():
       for paper in papers:
           title = paper.find(class_="paperTitle").string.strip()
-          author = paper.find(class_="author")
           withmarkers('paperTitle', title)
           begin_parent('paperTitle')
-          withmarkers('nameaffil', nameaffils(author))
+          withmarkers('nameaffil', nameaffils(paper)) # authors
           if paper.find(class_="hyperlink"):
               output(premarker('hyperlink'))
               output(postmarker('hyperlink'))
@@ -209,15 +208,8 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       if "postsession" in globals():
           begin_parent('discussantsSection')
           for dsection in postsession:
-              for d in dsection.children:      # discussant
-                  if not navigablestring(d):
-                      if rclass(d) != "discussant":
-                          output("%s class: %s %s %s %s" %
-                                 (d, rclass(d), type(d),
-                                  type(d).__name__, navigablestring(d)))
-                          raise NotImplementedError
-                      withmarkers('discussantsSection', "discussant: %s"
-                                  % nameaffils(d))
+              withmarkers('discussantsSection', "discussant: %s" %
+                          nameaffils(dsection)) # discussants
           end_parent('discussantsSection')
 
   # some semantic-aware utility routines
@@ -261,9 +253,9 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
   def output(outstr):
       global outf, outcount
       outstr = outstr.replace("%{d}", str(outcount))
+      outstr = outstr.replace("\\n", "\n")
       outcount += 1
       outf.write(outstr.encode("utf-8"))
-      outf.write(u"\n".encode("utf-8"))
 
   def navigablestring(cur):
       return type(cur).__name__ == "NavigableString"
