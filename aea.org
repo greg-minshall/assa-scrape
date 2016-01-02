@@ -181,10 +181,10 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
   def end_paper():
       for paper in papers:
-          begin_parent('paperTitle')
           title = paper.find(class_="paperTitle").string.strip()
           author = paper.find(class_="author")
           withmarkers('paperTitle', title)
+          begin_parent('paperTitle')
           withmarkers('nameaffil', nameaffils(author))
           if paper.find(class_="hyperlink"):
               output(premarker('hyperlink'))
