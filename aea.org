@@ -74,26 +74,26 @@ but, alternative doc would have "Source" at second level.
 problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
 #+name: htmlsections
-| tag                | section     | premarker                                                                            | postmarker | beforechild | afterchild |
-|--------------------+-------------+--------------------------------------------------------------------------------------+------------+-------------+------------|
-| dayHeader          | day         | <li><input type="checkbox" id="dayHeader%{d}"><label for="dayHeader%{d}">            | </label>   | <ul>        | </ul></li> |
-| sessionTime        | time        | <li><input type="checkbox" id="sessionTime%{d}"><label for="sessionTime%{d}">        | </label>   | <ul>        | </ul></li> |
-| sessionTitle       | session     | <li><input type="checkbox" id="sessionTitle%{d}"><label for="sessionTitle%{d}">      | </label>   | <ul>        | </ul></li> |
-| topic              | session     | <li>                                                                                 | </li>      |             |            |
-| sessionJEL         | session     | <li> JEL:                                                                            | </li>      |             |            |
-| sessionSource      | session     | <li>                                                                                 | </li>      |             |            |
-| sessionType        | session     | <li>                                                                                 | </li>      |             |            |
-| sessionLocation    | session     | <li>                                                                                 | </li>      |             |            |
-| presiding          | session     | <li>                                                                                 | </li>      |             |            |
-| panelist           | session     | <li>                                                                                 | </li>      |             |            |
-| paper              | paper       |                                                                                      |            |             |            |
-| paperTitle         | paper       | <li><input type="checkbox" id="paper%{d}"><label for="paper%{d}">                    | </label>   | <ul>        | </ul></li> |
-| author             | paper       | <li>                                                                                 | </li>      |             |            |
-| hyperlink          | paper       | <li> abstract: <input type="checkbox" id="hyperlink%{d}"><label for="hyperlink%{d}"> | </li>      | <ul>        | </ul>      |
-| nameaffil          |             | <li>                                                                                 | </li>      |             |            |
-| affiliation        |             | <li>                                                                                 | </li>      |             |            |
-| discussantsSection | postsession | <li>                                                                                 | </li>      | <ul>        | </ul>      |
-| discussant         | postsession |                                                                                      |            |             |            |
+| tag                | section     | premarker                                                                       | postmarker | beforechild      | afterchild      |
+|--------------------+-------------+---------------------------------------------------------------------------------+------------+------------------+-----------------|
+| dayHeader          | day         | <li><input type="checkbox" id="dayHeader%{d}"><label for="dayHeader%{d}">       | </label>   | <ul>             | </ul></li>      |
+| sessionTime        | time        | <li><input type="checkbox" id="sessionTime%{d}"><label for="sessionTime%{d}">   | </label>   | <ul>             | </ul></li>      |
+| sessionTitle       | session     | <li><input type="checkbox" id="sessionTitle%{d}"><label for="sessionTitle%{d}"> | </label>   | <ul>             | </ul></li>      |
+| topic              | session     | <li>                                                                            | </li>      |                  |                 |
+| sessionJEL         | session     | <li> JEL:                                                                       | </li>      |                  |                 |
+| sessionSource      | session     | <li>                                                                            | </li>      |                  |                 |
+| sessionType        | session     | <li>                                                                            | </li>      |                  |                 |
+| sessionLocation    | session     | <li>                                                                            | </li>      |                  |                 |
+| presiding          | session     | <li>                                                                            | </li>      |                  |                 |
+| panelist           | session     | <li>                                                                            | </li>      |                  |                 |
+| paper              | paper       |                                                                                 |            |                  |                 |
+| paperTitle         | paper       | <li><input type="checkbox" id="paper%{d}"><label for="paper%{d}">               | </label>   | <ul>             | </ul></li>      |
+| author             | paper       | <li>                                                                            | </li>      |                  |                 |
+| hyperlink          | paper       | <li><input type="checkbox" id="hyperlink%{d}"><label for="hyperlink%{d}">       | </label>   | abstract<ul><li> | </li></ul></li> |
+| nameaffil          |             | <li>                                                                            | </li>      |                  |                 |
+| affiliation        |             | <li>                                                                            | </li>      |                  |                 |
+| discussantsSection | postsession | <li>                                                                            | </li>      | <ul>             | </ul>           |
+| discussant         | postsession |                                                                                 |            |                  |                 |
 
 
 #+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var sections=htmlsections :var outfile="aea-sched.html"
@@ -188,10 +188,10 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('nameaffil', nameaffils(author))
           if paper.find(class_="hyperlink"):
               output(premarker('hyperlink'))
+              output(postmarker('hyperlink'))
               begin_parent('hyperlink')
               abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
               output(abstract)
-              output(postmarker('hyperlink'))
               end_parent('hyperlink')
           end_parent('paperTitle')
 
