@@ -100,12 +100,13 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
   import re
 
   def semantic_init():
-      global cur_day, cur_time, session, papers, postsession
+      global cur_day, cur_time, session, papers, postsession, abstractre
       cur_day = ""
       cur_time = ""
       session = {}
       papers = []
       postsession = []
+      abstractre = re.compile("paper_[0-9]*_abstract")
 
   def begin_day():
       end_parent('dayHeader')
@@ -187,11 +188,11 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('paperTitle', title)
           begin_parent('paperTitle')
           withmarkers('nameaffil', nameaffils(paper)) # authors
-          if paper.find(class_="hyperlink"):
+          if paper.find(id=abstractre):
               output(premarker('hyperlink'))
               output(postmarker('hyperlink'))
               begin_parent('hyperlink')
-              abstract = nextsib(paper.find(class_="hyperlink")).string.strip()
+              abstract = paper.find(id=abstractre).string.strip()
               output(abstract)
               end_parent('hyperlink')
           end_parent('paperTitle')
@@ -350,7 +351,6 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       walkdown(soup.findAll(id=re.compile("group_div.*")), outfile)
 
   def soupson(fname):
-      import re
       global soup
       from bs4 import BeautifulSoup
       # http://stackoverflow.com/questions/11339955/python-string-encode-decode
@@ -383,6 +383,20 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+The
+ Great Depression of the 1930s was followed by a series of regulatory 
+and policy decisions that laid the groundwork for a twenty-year post-war
+ expansion with stable prices and stable financial markets. The recent 
+crisis has also been characterized by regulatory and policy decisions 
+aimed at isolating government from responsibility for financial 
+instability and increasing the role of the Federal Reserve in regulatory
+ and supervisory matters. While financial markets have recovered, they 
+remain highly volatile, and the recovery in real activity has been 
+feeble. Are governments, politicians and economists less able to draw 
+the appropriate lessons from the recent crisis than they were in the 
+1930s?
+#+end_example
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
