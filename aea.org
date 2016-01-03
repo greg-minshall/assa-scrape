@@ -50,26 +50,26 @@ same, don't emit anything; else, emit a new "** Session time: %"
 but, alternative doc would have "Source" at second level.
 
 #+name: orgsections
-| tag                | section     | premarker        | postmarker | beforechild | afterchild |
-|--------------------+-------------+------------------+------------+-------------+------------|
-| dayHeader          | day         | **               | \n         |             |            |
-| sessionTime        | time        | ***              | \n         |             |            |
-| sessionTitle       | session     | ****             | \n         |             |            |
-| topic              | session     | *****            | \n         |             |            |
-| sessionJEL         | session     | - JEL:           | \n         |             |            |
-| sessionSource      | session     | -                | \n         |             |            |
-| sessionType        | session     |                  | \n         |             |            |
-| sessionLocation    | session     | -                | \n         |             |            |
-| presiding          | session     | - presiding:     | \n         |             |            |
-| panelist           | session     | - panelist:      | \n         |             |            |
-| paper              | paper       |                  | \n         |             |            |
-| paperTitle         | paper       | *****            | \n         |             |            |
-| author             | paper       | - author(s):     | \n         |             |            |
-| abstract           | paper       | - abstract:\n    | \n         |             |            |
-| nameaffil          |             | -                | \n         |             |            |
-| affiliation        |             |                  | \n         |             |            |
-| discussantsSection | postsession | *****            | \n         |             |            |
-| discussant         | postsession |                  | \n         |             |            |
+| tag                | section     | premarker     | postmarker | beforechild | afterchild |
+|--------------------+-------------+---------------+------------+-------------+------------|
+| dayHeader          | day         | **            | \n         |             |            |
+| sessionTime        | time        | ***           | \n         |             |            |
+| sessionTitle       | session     | ****          | \n         |             |            |
+| topic              | session     | *****         | \n         |             |            |
+| sessionJEL         | session     | - JEL:        | \n         |             |            |
+| sessionSource      | session     | -             | \n         |             |            |
+| sessionType        | session     |               | \n         |             |            |
+| sessionLocation    | session     | -             | \n         |             |            |
+| presiding          | session     | - presiding:  | \n         |             |            |
+| panelist           | session     | - panelist:   | \n         |             |            |
+| paper              | paper       |               | \n         |             |            |
+| paperTitle         | paper       | *****         | \n         |             |            |
+| author             | paper       | - author(s):  | \n         |             |            |
+| abstract           | paper       | - abstract:\n | \n         |             | \n         |
+| nameaffil          |             | -             | \n         |             |            |
+| affiliation        |             |               | \n         |             |            |
+| discussantsSection | postsession | *****         | \n         |             |            |
+| discussant         | postsession |               | \n         |             |            |
 
 problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
