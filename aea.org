@@ -60,8 +60,8 @@ but, alternative doc would have "Source" at second level.
 | sessionSource      | session     | -                | \n         |             |            |
 | sessionType        | session     |                  | \n         |             |            |
 | sessionLocation    | session     | -                | \n         |             |            |
-| presiding          | session     | -                | \n         |             |            |
-| panelist           | session     | -                | \n         |             |            |
+| presiding          | session     | - presiding:     | \n         |             |            |
+| panelist           | session     | - panelist:      | \n         |             |            |
 | paper              | paper       |                  | \n         |             |            |
 | paperTitle         | paper       | *****            | \n         |             |            |
 | author             | paper       | - author(s):     | \n         |             |            |
@@ -84,8 +84,8 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 | sessionSource      | session     | <li>                                                                              | </li>      |             |                 |
 | sessionType        | session     | <li>                                                                              | </li>      |             |                 |
 | sessionLocation    | session     | <li>                                                                              | </li>\n    |             |                 |
-| presiding          | session     | <li>                                                                              | </li>\n    |             |                 |
-| panelist           | session     | <li>                                                                              | </li>\n    |             |                 |
+| presiding          | session     | <li> presiding:                                                                   | </li>\n    |             |                 |
+| panelist           | session     | <li> panelist:                                                                    | </li>\n    |             |                 |
 | paper              | paper       |                                                                                   |            |             |                 |
 | paperTitle         | paper       | <li><input type="checkbox" id="paper%{d}"><label for="paper%{d}">                 | </label>\n | <ul>        | </ul></li>      |
 | author             | paper       | <li>                                                                              | </li>\n    |             |                 |
@@ -165,6 +165,8 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       withmarkers('sessionLocation', re.sub("^,", "", session['sessionLocation'].string.strip()))
       if 'presiding' in session:
           withmarkers('nameaffil', nameaffils(session['presiding']))
+      if 'panelist' in session:
+          withmarkers('nameaffil', nameaffils(session['panelist']))
 
   # paper.format =
   # "***** $paperTitle
@@ -347,31 +349,30 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       parents = []
       walkdown(soup.findAll(id=re.compile("group_div.*")), outfile)
 
+  def soupson(fname):
+      import re
+      global soup
+      from bs4 import BeautifulSoup
+      # http://stackoverflow.com/questions/11339955/python-string-encode-decode
+      html = open(fname, "r").read()
+      # need to get rid of <hr>, <br> (mess up beautifulsoup)
+      # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
+      # and, <strong>, <em>, seem to get in our way (by making cur.string =
+      # "", needing to descend
+      # XXX -- should be some more general way of doing this!
+      p = re.compile("<br>|<br />|<hr>|<hr />|<strong>|</strong>|<em>|</em>|<input type='hidden' value='[0-9]*' name='div_contents\[\]' />")
+      html = p.sub("", html)
+      for i in ["<br>", "<br />", "<hr>", "<hr />", "<strong>", "</strong>", "<em>", "</em>"]:
+          html = html.replace(i, "")
+      # from
+      # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
+      soup = BeautifulSoup(html, 'html.parser', from_encoding="utf-8")
+
   s_section = 0
   s_premarker = 1
   s_postmarker = 2
   s_beforechild = 3
   s_afterchild = 4
-
-  def soupson(fname):
-      from bs4 import BeautifulSoup
-      # http://stackoverflow.com/questions/11339955/python-string-encode-decode
-      html = open(fname, "r").read()
-
-      # need to get rid of <hr>, <br> (mess up beautifulsoup)
-      # http://stackoverflow.com/questions/17639031/beautifulsoup-sibling-structure-with-br-tags
-
-      # and, <strong>, <em>, seem to get in our way (by making cur.string =
-      # "", needing to descend
-
-      # XXX -- should be some more general way of doing this!
-      for i in ["<br>", "<hr>", "<strong>", "</strong>", "<em>", "</em>"]:
-          html = html.replace(i, "")
-
-      # from
-      # http://www.crummy.com/software/BeautifulSoup/bs4/doc/
-      soup = BeautifulSoup(html, 'html.parser', from_encoding="utf-8")
-
 
   soupson(fname)
 
@@ -382,10 +383,8 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+END_SRC
 
 #+RESULTS:
-: <div class="author">
-: <font class="name">Jan Kregel					</font>
-: <font class="affiliation">(Levy Economics Institute of Bard College)</font>
-: </div>
+: <form id="group_2">
+: </form>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
