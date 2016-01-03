@@ -98,6 +98,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
 #+BEGIN_SRC python :session py :var fname="AEAweb-2016-ASSA-Preliminary-Program.html" :var orgsections=orgsections :var orgoutfile="aea-sched-mid.org" :var htmlsections=htmlsections :var htmloutfile="aea-sched-mid.html"
   import re
+  import textwrap
 
   def semantic_init():
       global cur_day, cur_time, session, papers, postsession, abstractre
@@ -192,7 +193,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
               output(premarker('abstract'))
               output(postmarker('abstract'))
               begin_parent('abstract')
-              abstract = paper.find(id=abstractre).string.strip()
+              abstract = textwrap.fill(paper.find(id=abstractre).string.replace("\n", "").strip())
               output(abstract)
               end_parent('abstract')
           end_parent('paperTitle')
@@ -383,6 +384,18 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+END_SRC
 
 #+RESULTS:
+#+begin_example
+I develop a new method to estimate intergenerational mobility (IM) in
+educational attainment on U.S. census data spanning 1940-2000. I
+measure IM directly for children still living with parents at ages
+26-29, and indirectly for other children using an imputation procedure
+that I validate in multiple datasets spanning the full sample period.
+Educational IM increased significantly 1940-1970 and declined after
+1980. Post-1940 IM gains were economically large, driven by high
+school rather than college enrollment, and were larger for blacks
+primarily due to all-race IM gains in the South. I discuss potential
+causes of these patterns.
+#+end_example
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
