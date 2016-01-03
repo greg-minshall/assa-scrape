@@ -1,0 +1,11 @@
+* assa-scrape
+
+This small package uses Python's nice [[http://www.crummy.com/software/BeautifulSoup/][Beautiful Soup]] ([[http://www.crummy.com/software/BeautifulSoup/bs4/doc/][documentation]])
+to scrape the web version of the [[https://www.aeaweb.org/aea/2016conference/program/preliminary.php][program]] for the 2016 ASSA economics
+meeting (in San Francisco) and produce an [[https://duckduckgo.com/l/?kh=-1&uddg=https%3A%2F%2Fwww.gnu.org%2Fsoftware%2Femacs%2F][emacs]] [[http://r.duckduckgo.com/l/?kh=-1&uddg=http%3A%2F%2Forgmode.org%2F][org mode]] file, as well
+as a [[http://bradclicks.com/CSSplay/foldingList.html][collapsible HTML file]] (the native ASSA version displays as a flat
+list).
+
+The main file is aea.org, which includes a source bit that is the
+actual code.  There are random other bits and pieces in aea.org which
+can be safely ignored.
