@@ -164,9 +164,9 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
           withmarkers('sessionType', session['sessionType'].string.strip())
       withmarkers('sessionLocation', re.sub("^,", "", session['sessionLocation'].string.strip()))
       if 'presiding' in session:
-          withmarkers('nameaffil', nameaffils(session['presiding']))
+          withmarkers('presiding', nameaffils(session['presiding']))
       if 'panelist' in session:
-          withmarkers('nameaffil', nameaffils(session['panelist']))
+          withmarkers('panelist', nameaffils(session['panelist']))
 
   # paper.format =
   # "***** $paperTitle
@@ -383,8 +383,6 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+END_SRC
 
 #+RESULTS:
-: <form id="group_2">
-: </form>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
