@@ -96,7 +96,7 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 | discussant         | postsession |                                                                                   |            |             |                 |
 
 
-#+BEGIN_SRC python :session py :var fname="aea-2016-assa-prelim.html" :var orgsections=orgsections :var orgoutfile="aea-sched-mid.org" :var htmlsections=htmlsections :var htmloutfile="aea-sched-mid.html"
+#+BEGIN_SRC python :session py :var fname="AEAweb-2016-ASSA-Preliminary-Program.html" :var orgsections=orgsections :var orgoutfile="aea-sched-mid.org" :var htmlsections=htmlsections :var htmloutfile="aea-sched-mid.html"
   import re
 
   def semantic_init():
@@ -214,12 +214,17 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 
   # some semantic-aware utility routines
 
-  def nameaffils(cur, separator=", "): # XXX descend to get names and affiliations
+  def nameaffils(curl, separator=", "): # XXX descend to get names and affiliations
       result = ""
       cursep = ""
-      for name, affil in zip(cur.findAll(class_="name"), cur.findAll(class_="affiliation")):
-          result = result + cursep + name.string.strip() + " " + affil.string.strip()
-          cursep = separator
+      # to allow ResultSet to work, make *everything* a list
+      if type(curl).__name__ != 'ResultSet':
+          curl = [curl]
+      for cur in curl:
+          for name, affil in zip(cur.findAll(class_="name"),
+                                 cur.findAll(class_="affiliation")):
+              result = result + cursep + name.string.strip() + " " + affil.string.strip()
+              cursep = separator
       return result
 
 
@@ -277,11 +282,14 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
       except Exception:
           return ""
 
-  def nextsib(cur):
+  def nextsib(cur, count=1):
       x = cur.next_sibling;
       while type(x).__name__ == "NavigableString":
           x = x.next_sibling
-      return x
+      if count <= 1:
+          return x
+      else:
+          return nextsib(x, count-1)
 
   def firstchild(cur):
       try:
@@ -374,6 +382,10 @@ problem with HTML: need to *surround* children with, e.g., <ul>...</ul>
 #+END_SRC
 
 #+RESULTS:
+: <div class="author">
+: <font class="name">Jan Kregel					</font>
+: <font class="affiliation">(Levy Economics Institute of Bard College)</font>
+: </div>
 
 
 #+BEGIN_SRC python :var fname="aea-2016-assa-prelim.html" :session py
